@@ -84,6 +84,7 @@ export type FieldType =
   | "number"
   | "date"
   | "phone"
+  | "file"
   | "select"
   | "searchable-select"
   | "radio-group"
@@ -114,6 +115,13 @@ export type FieldConfig = {
   maxDate?: Date;
   /** date-fns format string, defaults to "PPP" */
   dateFormat?: string;
+  // file field
+  /** Accepted MIME types or extensions, e.g. ["pdf", "jpg", "png"] */
+  accept?: string[];
+  /** Maximum file size in megabytes */
+  maxSizeMB?: number;
+  /** Allow picking multiple files (defaults to false) */
+  multiple?: boolean;
   // select / radio / checkbox-group
   options?: OptionsConfig;
   emptyText?: string;
@@ -142,6 +150,12 @@ export type BlockConfig = {
   description?: string;
   /** Default: "single" */
   layout?: BlockLayout;
+  /**
+   * When set, the block's fields will be nested under this key within the
+   * parent step's output. Multiple blocks sharing the same `dataKey` are
+   * merged together.
+   */
+  dataKey?: string;
   fields: FieldConfig[];
   showWhen?: ConditionExpr;
   hideWhen?: ConditionExpr;
@@ -155,6 +169,11 @@ export type StepConfig = {
   id: string;
   title: string;
   description?: string;
+  /**
+   * When set, the step's fields will be nested under this key in the final
+   * submitted value object (used with `groupValuesByConfig`).
+   */
+  dataKey?: string;
   blocks: BlockConfig[];
 };
 

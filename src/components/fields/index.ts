@@ -1,6 +1,7 @@
 export { CheckboxField } from "./CheckboxField";
 export { CheckboxGroupField } from "./CheckboxGroupField";
 export { DatePickerField } from "./DatePickerField";
+export { FileUploadField } from "./FileUploadField";
 export { NumberInputField } from "./NumberInputField";
 export { PhoneInputField } from "./PhoneInputField";
 export { RadioGroupField } from "./RadioGroupField";

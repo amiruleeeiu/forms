@@ -4,6 +4,7 @@ import {
   CheckboxField,
   CheckboxGroupField,
   DatePickerField,
+  FileUploadField,
   NumberInputField,
   PhoneInputField,
   RadioGroupField,
@@ -152,6 +153,16 @@ export function FieldRenderer({ config }: FieldRendererProps) {
 
     case "checkbox":
       return <CheckboxField {...commonProps} />;
+
+    case "file":
+      return (
+        <FileUploadField
+          {...commonProps}
+          accept={config.accept}
+          maxSizeMB={config.maxSizeMB}
+          multiple={config.multiple}
+        />
+      );
 
     default:
       return null;

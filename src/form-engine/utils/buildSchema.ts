@@ -55,6 +55,28 @@ function buildFieldSchema(field: FieldConfig): z.ZodTypeAny {
     return isRequired ? s : s.optional();
   }
 
+  // ---- file ----
+  if (field.type === "file") {
+    const fileSchema = z.custom<File | null>(
+      (val) => {
+        if (!isRequired) return true;
+        return val instanceof File;
+      },
+      {
+        message:
+          field.validation?.messages?.required ?? `${field.label} is required`,
+      },
+    );
+    if (field.maxSizeMB !== undefined) {
+      const maxBytes = field.maxSizeMB * 1024 * 1024;
+      return fileSchema.refine(
+        (val) => !(val instanceof File) || val.size <= maxBytes,
+        { message: `File must be smaller than ${field.maxSizeMB}MB` },
+      );
+    }
+    return fileSchema;
+  }
+
   // ---- phone ----
   if (field.type === "phone") {
     let s = z.string();
@@ -179,6 +201,9 @@ export function buildDefaultValues(
         break;
       case "checkbox-group":
         defaults[field.name] = [];
+        break;
+      case "file":
+        defaults[field.name] = null;
         break;
       case "number":
       case "date":

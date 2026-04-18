@@ -38,6 +38,16 @@ export default function Home() {
                 Multi-step registration with per-step validation.
               </p>
             </Link>
+            <Link
+              href="/security-clearance"
+              className="flex-1 rounded-lg border p-4 hover:bg-muted/50 transition-colors"
+            >
+              <p className="font-medium">Security Clearance</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                7-step application form with file uploads and conditional
+                blocks.
+              </p>
+            </Link>
           </div>
         </div>
       </main>
