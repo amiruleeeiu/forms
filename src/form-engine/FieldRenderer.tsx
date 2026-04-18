@@ -34,7 +34,7 @@ function OptionsField({ config, disabled }: OptionsFieldProps) {
     name: config.name as never,
     label: config.label,
     placeholder: config.placeholder,
-    required: config.required,
+    required: config.required !== false,
     disabled: disabled || loading,
     description: config.description,
   };
@@ -103,7 +103,9 @@ export function FieldRenderer({ config }: FieldRendererProps) {
     name: config.name as never,
     label: config.label,
     placeholder: config.placeholder,
-    required: config.required,
+    // Fields are required by default (matching buildSchema behaviour); only
+    // pass false when explicitly opted out.
+    required: config.required !== false,
     disabled,
     description: config.description,
   };
@@ -161,6 +163,7 @@ export function FieldRenderer({ config }: FieldRendererProps) {
           accept={config.accept}
           maxSizeMB={config.maxSizeMB}
           multiple={config.multiple}
+          variant={config.fileVariant}
         />
       );
 

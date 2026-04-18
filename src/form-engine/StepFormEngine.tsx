@@ -4,14 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { type DefaultValues, type FieldValues, useForm } from "react-hook-form";
 import type { ZodType } from "zod";
 import { BlockRenderer } from "./BlockRenderer";
 import { StepIndicator } from "./StepIndicator";
 import type { StepFormConfig } from "./types";
 import { buildDefaultValues, buildSchemaFromConfig } from "./utils/buildSchema";
-import { getStepFieldNames } from "./utils/getStepFieldNames";
+import { getStepDevData } from "./utils/getStepDevData";
+import { getVisibleRequiredErrors } from "./utils/getVisibleRequiredErrors";
+import { getVisibleStepFieldNames } from "./utils/getVisibleStepFieldNames";
 
 type StepFormEngineProps<TFieldValues extends FieldValues> = {
   config: StepFormConfig;
@@ -20,6 +22,14 @@ type StepFormEngineProps<TFieldValues extends FieldValues> = {
   /** Optional — if omitted sensible empty defaults are derived from the config. */
   defaultValues?: DefaultValues<TFieldValues>;
   onSubmit: (values: TFieldValues) => void | Promise<void>;
+  /** Optional — called with current values (no validation) when user clicks Draft. */
+  onDraft?: (values: TFieldValues) => void | Promise<void>;
+  /**
+   * Optional flat field-name→value map used by the dev Import button.
+   * When provided, clicking Import fills ALL steps at once via form.reset.
+   * Keys that match registered field names are applied; others are ignored.
+   */
+  sampleData?: Record<string, unknown>;
 };
 
 /**
@@ -33,8 +43,11 @@ export function StepFormEngine<TFieldValues extends FieldValues>({
   schema,
   defaultValues,
   onSubmit,
+  onDraft,
+  sampleData,
 }: StepFormEngineProps<TFieldValues>) {
   const [currentStep, setCurrentStep] = useState(0);
+  const formRef = useRef<HTMLFormElement>(null);
   const steps = config.steps;
   const isLastStep = currentStep === steps.length - 1;
 
@@ -50,21 +63,46 @@ export function StepFormEngine<TFieldValues extends FieldValues>({
   });
 
   const handleNext = async () => {
-    const fieldNames = getStepFieldNames(steps[currentStep]);
-    const valid = await form.trigger(fieldNames as never[]);
-    if (valid) {
+    const values = form.getValues() as Record<string, unknown>;
+    const visibleFieldNames = getVisibleStepFieldNames(
+      steps[currentStep],
+      values,
+    );
+    const zodValid = await form.trigger(visibleFieldNames as never[]);
+
+    // Zod marks conditional-block fields as optional to avoid blocking when
+    // hidden. Manually enforce required validation for visible empty fields.
+    const manualErrors = getVisibleRequiredErrors(steps[currentStep], values);
+    for (const err of manualErrors) {
+      form.setError(err.name as never, {
+        type: "required",
+        message: err.message,
+      });
+    }
+
+    if (zodValid && manualErrors.length === 0) {
+      // Reset all form state (errors, touched, dirty) while keeping current
+      // values. This prevents the zodResolver—which runs against the full
+      // schema during trigger()—from leaking stale errors onto the next
+      // step's fields the moment they mount and register themselves.
+      form.reset(form.getValues());
       setCurrentStep((prev) => prev + 1);
     } else {
-      // trigger() validates but doesn't mark fields as touched, so RHF's
-      // reValidateMode:onChange won't fire for untouched fields. Touch them
-      // now so typing a correction immediately clears the error.
-      for (const name of fieldNames) {
+      // Touch all visible fields so RHF's reValidateMode:onChange fires.
+      for (const name of visibleFieldNames) {
         form.setValue(name as never, form.getValues(name as never), {
           shouldTouch: true,
           shouldDirty: false,
           shouldValidate: false,
         });
       }
+      // Scroll to the first error field after React flushes the DOM update.
+      requestAnimationFrame(() => {
+        const firstError = formRef.current?.querySelector(
+          '[aria-invalid="true"]',
+        );
+        firstError?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
     }
   };
 
@@ -72,23 +110,66 @@ export function StepFormEngine<TFieldValues extends FieldValues>({
     setCurrentStep((prev) => prev - 1);
   };
 
+  const handleDraft = () => {
+    onDraft?.(form.getValues());
+  };
+
+  const importDevData = () => {
+    if (sampleData) {
+      // Fill all steps at once by merging sample data over defaults.
+      form.reset({ ...resolvedDefaults, ...sampleData } as DefaultValues<TFieldValues>);
+    } else {
+      const sample = getStepDevData(activeStep);
+      for (const [key, value] of Object.entries(sample)) {
+        form.setValue(key as never, value as never, { shouldDirty: true });
+      }
+    }
+  };
+
   const activeStep = steps[currentStep];
 
   return (
     <Form {...form}>
       <form
+        ref={formRef}
         onSubmit={form.handleSubmit((data) => onSubmit(data))}
+        onKeyDown={(e) => {
+          // Prevent Enter in input fields from triggering implicit form
+          // submission, which would run zodResolver on all fields and
+          // pre-populate errors for steps not yet visited.
+          if (
+            e.key === "Enter" &&
+            e.target instanceof HTMLInputElement
+          ) {
+            e.preventDefault();
+          }
+        }}
         className="space-y-6"
         noValidate
       >
         <StepIndicator steps={steps} currentStep={currentStep} />
 
-        <div className="space-y-1">
-          <h2 className="text-xl font-semibold">{activeStep.title}</h2>
-          {activeStep.description && (
-            <p className="text-sm text-muted-foreground">
-              {activeStep.description}
-            </p>
+        <div className="flex items-start justify-between gap-2">
+          <div className="space-y-1">
+            <h2 className="text-xl font-semibold">{activeStep.title}</h2>
+            {activeStep.description && (
+              <p className="text-sm text-muted-foreground">
+                {activeStep.description}
+              </p>
+            )}
+          </div>
+
+          {process.env.NODE_ENV === "development" && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={importDevData}
+              className="shrink-0 border-dashed border-orange-400 text-orange-500 hover:bg-orange-50 hover:text-orange-600"
+              title="Dev: fill this step with sample data"
+            >
+              Import
+            </Button>
           )}
         </div>
 
@@ -102,6 +183,12 @@ export function StepFormEngine<TFieldValues extends FieldValues>({
           {currentStep > 0 && (
             <Button type="button" variant="outline" onClick={handleBack}>
               Back
+            </Button>
+          )}
+
+          {onDraft && (
+            <Button type="button" variant="outline" onClick={handleDraft}>
+              Draft
             </Button>
           )}
 

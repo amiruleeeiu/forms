@@ -1,4 +1,107 @@
-import type { StepFormConfig } from "@/form-engine/types";
+import type { FieldConfig, StepFormConfig } from "@/form-engine/types";
+
+// ---------------------------------------------------------------------------
+// Shared helpers for Step 4: Residential Address
+// ---------------------------------------------------------------------------
+
+const LOCAL_ADDRESS_RESET_ON: string[] = [
+  "accommodationType",
+  "selfAccommodationStatus",
+  "companyAccommodationStatus",
+  "companyAccommodationLocation",
+];
+
+const DIVISION_OPTIONS = [
+  { label: "Dhaka", value: "dhaka" },
+  { label: "Chittagong", value: "chittagong" },
+  { label: "Rajshahi", value: "rajshahi" },
+  { label: "Khulna", value: "khulna" },
+  { label: "Barishal", value: "barishal" },
+  { label: "Sylhet", value: "sylhet" },
+  { label: "Rangpur", value: "rangpur" },
+  { label: "Mymensingh", value: "mymensingh" },
+];
+
+const DISTRICT_OPTIONS = [
+  { label: "Dhaka", value: "dhaka" },
+  { label: "Gazipur", value: "gazipur" },
+  { label: "Narayanganj", value: "narayanganj" },
+  { label: "Chattogram", value: "chattogram" },
+];
+
+const POLICE_STATION_OPTIONS = [
+  { label: "Kapasia", value: "kapasia" },
+  { label: "Mirpur", value: "mirpur" },
+  { label: "Dhanmondi", value: "dhanmondi" },
+  { label: "Gulshan", value: "gulshan" },
+];
+
+/** Standard local address fields — shared across all non-factory scenarios. */
+const STANDARD_LOCAL_ADDRESS_FIELDS: FieldConfig[] = [
+  {
+    name: "localDivision",
+    type: "select",
+    label: "Division",
+    placeholder: "Select One",
+    options: { type: "static", items: DIVISION_OPTIONS },
+  },
+  {
+    name: "localDistrict",
+    type: "select",
+    label: "District",
+    placeholder: "Select District",
+    options: { type: "static", items: DISTRICT_OPTIONS },
+  },
+  {
+    name: "localPoliceStation",
+    type: "select",
+    label: "Police Station",
+    placeholder: "Select Police Station",
+    options: { type: "static", items: POLICE_STATION_OPTIONS },
+  },
+  {
+    name: "localPostOffice",
+    type: "text",
+    label: "Post Office",
+    placeholder: "Post Office",
+  },
+  {
+    name: "localPostalCode",
+    type: "text",
+    label: "Postal Code / Zip Code",
+    placeholder: "Postal Code / Zip Code",
+  },
+  {
+    name: "localArea",
+    type: "text",
+    label: "Area",
+    placeholder: "Area",
+  },
+  {
+    name: "localRoad",
+    type: "text",
+    label: "Road",
+    placeholder: "Road",
+  },
+  {
+    name: "localFlat",
+    type: "text",
+    label: "Flat",
+    placeholder: "Flat",
+  },
+  {
+    name: "localHouse",
+    type: "text",
+    label: "House",
+    placeholder: "House",
+  },
+  {
+    name: "localPhone",
+    type: "phone",
+    label: "Phone No.",
+    validation: { validatePhone: false },
+  },
+];
 
 export const securityClearanceFormConfig: StepFormConfig = {
   mode: "stepped",
@@ -139,9 +242,64 @@ export const securityClearanceFormConfig: StepFormConfig = {
           fields: [
             {
               name: "foreignCountry",
-              type: "text",
+              type: "searchable-select",
               label: "Country",
-              placeholder: "Country",
+              placeholder: "Select Country",
+              options: {
+                type: "static",
+                items: [
+                  { label: "Afghanistan", value: "afghanistan" },
+                  { label: "Algeria", value: "algeria" },
+                  { label: "Australia", value: "australia" },
+                  { label: "Bahrain", value: "bahrain" },
+                  { label: "Bangladesh", value: "bangladesh" },
+                  { label: "Belgium", value: "belgium" },
+                  { label: "Brazil", value: "brazil" },
+                  { label: "Canada", value: "canada" },
+                  { label: "China", value: "china" },
+                  { label: "Denmark", value: "denmark" },
+                  { label: "Egypt", value: "egypt" },
+                  { label: "France", value: "france" },
+                  { label: "Germany", value: "germany" },
+                  { label: "India", value: "india" },
+                  { label: "Indonesia", value: "indonesia" },
+                  { label: "Iran", value: "iran" },
+                  { label: "Iraq", value: "iraq" },
+                  { label: "Italy", value: "italy" },
+                  { label: "Japan", value: "japan" },
+                  { label: "Jordan", value: "jordan" },
+                  { label: "Kuwait", value: "kuwait" },
+                  { label: "Lebanon", value: "lebanon" },
+                  { label: "Libya", value: "libya" },
+                  { label: "Malaysia", value: "malaysia" },
+                  { label: "Maldives", value: "maldives" },
+                  { label: "Morocco", value: "morocco" },
+                  { label: "Myanmar", value: "myanmar" },
+                  { label: "Nepal", value: "nepal" },
+                  { label: "Netherlands", value: "netherlands" },
+                  { label: "Nigeria", value: "nigeria" },
+                  { label: "Norway", value: "norway" },
+                  { label: "Oman", value: "oman" },
+                  { label: "Pakistan", value: "pakistan" },
+                  { label: "Philippines", value: "philippines" },
+                  { label: "Qatar", value: "qatar" },
+                  { label: "Russia", value: "russia" },
+                  { label: "Saudi Arabia", value: "saudi-arabia" },
+                  { label: "Singapore", value: "singapore" },
+                  { label: "South Korea", value: "south-korea" },
+                  { label: "Spain", value: "spain" },
+                  { label: "Sri Lanka", value: "sri-lanka" },
+                  { label: "Sweden", value: "sweden" },
+                  { label: "Switzerland", value: "switzerland" },
+                  { label: "Thailand", value: "thailand" },
+                  { label: "Turkey", value: "turkey" },
+                  { label: "United Arab Emirates", value: "uae" },
+                  { label: "United Kingdom", value: "uk" },
+                  { label: "United States", value: "usa" },
+                  { label: "Vietnam", value: "vietnam" },
+                  { label: "Yemen", value: "yemen" },
+                ],
+              },
             },
             {
               name: "foreignState",
@@ -214,12 +372,12 @@ export const securityClearanceFormConfig: StepFormConfig = {
             operator: "eq",
             value: "self-arrangement",
           },
+          resetOn: ["accommodationType"],
           fields: [
             {
               name: "selfAccommodationStatus",
               type: "radio-group",
               label: "Accommodation Status",
-              required: false,
               options: {
                 type: "static",
                 items: [
@@ -240,12 +398,12 @@ export const securityClearanceFormConfig: StepFormConfig = {
             operator: "eq",
             value: "arranged-by-company",
           },
+          resetOn: ["accommodationType"],
           fields: [
             {
               name: "companyAccommodationStatus",
               type: "radio-group",
               label: "Accommodation Status",
-              required: false,
               options: {
                 type: "static",
                 items: [
@@ -266,12 +424,12 @@ export const securityClearanceFormConfig: StepFormConfig = {
             operator: "eq",
             value: "company-owned",
           },
+          resetOn: ["accommodationType", "companyAccommodationStatus"],
           fields: [
             {
               name: "companyAccommodationLocation",
               type: "radio-group",
               label: "Accommodation Location",
-              required: false,
               options: {
                 type: "static",
                 items: [
@@ -283,129 +441,171 @@ export const securityClearanceFormConfig: StepFormConfig = {
           ],
         },
 
-        // --- Local Address (shown once accommodation type selected) ---
+        // --- Temporary Address (self-arrangement + temporary) ---
         {
-          id: "local-address-block",
+          id: "temporary-address-block",
+          title: "Temporary Address",
+          dataKey: "localAddress",
+          layout: "2-col",
+          showWhen: {
+            field: "selfAccommodationStatus",
+            operator: "eq",
+            value: "temporary",
+          },
+          resetOn: LOCAL_ADDRESS_RESET_ON,
+          fields: STANDARD_LOCAL_ADDRESS_FIELDS,
+        },
+
+        // --- Current Address (self-arrangement + current) ---
+        {
+          id: "current-address-block",
+          title: "Current Address",
+          dataKey: "localAddress",
+          layout: "2-col",
+          showWhen: {
+            field: "selfAccommodationStatus",
+            operator: "eq",
+            value: "current",
+          },
+          resetOn: LOCAL_ADDRESS_RESET_ON,
+          fields: STANDARD_LOCAL_ADDRESS_FIELDS,
+        },
+
+        // --- Residential Address (company + rented-by-company) ---
+        {
+          id: "residential-address-block",
+          title: "Residential Address",
+          dataKey: "localAddress",
+          layout: "2-col",
+          showWhen: {
+            field: "companyAccommodationStatus",
+            operator: "eq",
+            value: "rented-by-company",
+          },
+          resetOn: LOCAL_ADDRESS_RESET_ON,
+          fields: STANDARD_LOCAL_ADDRESS_FIELDS,
+        },
+
+        // --- Address (company + outside-factory) ---
+        {
+          id: "outside-factory-address-block",
           title: "Address",
           dataKey: "localAddress",
           layout: "2-col",
-          showWhen: { field: "accommodationType", operator: "truthy" },
-          fields: [
-            {
-              name: "localDivision",
-              type: "select",
-              label: "Division",
-              placeholder: "Select One",
-              required: false,
-              options: {
-                type: "static",
-                items: [
-                  { label: "Dhaka", value: "dhaka" },
-                  { label: "Chittagong", value: "chittagong" },
-                  { label: "Rajshahi", value: "rajshahi" },
-                  { label: "Khulna", value: "khulna" },
-                  { label: "Barishal", value: "barishal" },
-                  { label: "Sylhet", value: "sylhet" },
-                  { label: "Rangpur", value: "rangpur" },
-                  { label: "Mymensingh", value: "mymensingh" },
-                ],
-              },
-            },
-            {
-              name: "localDistrict",
-              type: "select",
-              label: "District",
-              placeholder: "Select District",
-              required: false,
-              options: {
-                type: "static",
-                items: [
-                  { label: "Dhaka", value: "dhaka" },
-                  { label: "Gazipur", value: "gazipur" },
-                  { label: "Narayanganj", value: "narayanganj" },
-                  { label: "Chattogram", value: "chattogram" },
-                ],
-              },
-            },
-            {
-              name: "localPoliceStation",
-              type: "select",
-              label: "Police Station",
-              placeholder: "Select Police Station",
-              required: false,
-              options: {
-                type: "static",
-                items: [
-                  { label: "Kapasia", value: "kapasia" },
-                  { label: "Mirpur", value: "mirpur" },
-                  { label: "Dhanmondi", value: "dhanmondi" },
-                  { label: "Gulshan", value: "gulshan" },
-                ],
-              },
-            },
-            {
-              name: "localPostOffice",
-              type: "text",
-              label: "Post Office",
-              placeholder: "Post office",
-              required: false,
-            },
-            {
-              name: "localPostalCode",
-              type: "text",
-              label: "Postal Code / Zip Code",
-              placeholder: "Postal Code / Zip Code",
-              required: false,
-            },
-            {
-              name: "localArea",
-              type: "text",
-              label: "Area",
-              placeholder: "Area",
-              required: false,
-            },
-            {
-              name: "localRoad",
-              type: "text",
-              label: "Road",
-              placeholder: "Road",
-              required: false,
-            },
-            {
-              name: "localFlat",
-              type: "text",
-              label: "Flat",
-              placeholder: "Flat",
-              required: false,
-            },
-            {
-              name: "localHouse",
-              type: "text",
-              label: "House",
-              placeholder: "House",
-              required: false,
-            },
-            {
-              name: "localPhone",
-              type: "phone",
-              label: "Phone No.",
-              required: false,
-              validation: { validatePhone: false },
-            },
-          ],
+          showWhen: {
+            field: "companyAccommodationLocation",
+            operator: "eq",
+            value: "outside-factory",
+          },
+          resetOn: LOCAL_ADDRESS_RESET_ON,
+          fields: STANDARD_LOCAL_ADDRESS_FIELDS,
         },
         {
           id: "local-email-block",
           dataKey: "localAddress",
           layout: "single",
-          showWhen: { field: "accommodationType", operator: "truthy" },
+          showWhen: {
+            or: [
+              { field: "selfAccommodationStatus", operator: "truthy" },
+              {
+                field: "companyAccommodationStatus",
+                operator: "eq",
+                value: "rented-by-company",
+              },
+              {
+                field: "companyAccommodationLocation",
+                operator: "eq",
+                value: "outside-factory",
+              },
+            ],
+          },
+          resetOn: LOCAL_ADDRESS_RESET_ON,
           fields: [
             {
               name: "localEmail",
               type: "email",
               label: "Email",
-              placeholder: "email",
-              required: false,
+              placeholder: "Email",
+            },
+          ],
+        },
+
+        // --- Factory Address (company + within-factory) ---
+        {
+          id: "factory-address-block",
+          title: "Factory Address",
+          dataKey: "factoryAddress",
+          layout: "2-col",
+          showWhen: {
+            field: "companyAccommodationLocation",
+            operator: "eq",
+            value: "within-factory",
+          },
+          resetOn: LOCAL_ADDRESS_RESET_ON,
+          fields: [
+            {
+              name: "factoryDivision",
+              type: "select",
+              label: "Division",
+              placeholder: "Select One",
+              options: { type: "static", items: DIVISION_OPTIONS },
+            },
+            {
+              name: "factoryDistrict",
+              type: "select",
+              label: "District",
+              placeholder: "Select District",
+              options: { type: "static", items: DISTRICT_OPTIONS },
+            },
+            {
+              name: "factoryPoliceStation",
+              type: "select",
+              label: "Police Station",
+              placeholder: "Select Police Station",
+              options: { type: "static", items: POLICE_STATION_OPTIONS },
+            },
+            {
+              name: "factoryPostOffice",
+              type: "text",
+              label: "Post Office",
+              placeholder: "Post Office",
+            },
+            {
+              name: "factoryPostalCode",
+              type: "text",
+              label: "Postal Code / Zip Code",
+              placeholder: "Postal Code / Zip Code",
+            },
+            {
+              name: "factoryAddressLine",
+              type: "text",
+              label: "House, Flat/Apartment, Road",
+              placeholder: "Enter address",
+            },
+            {
+              name: "factoryPhone",
+              type: "phone",
+              label: "Phone No.",
+              validation: { validatePhone: false },
+            },
+          ],
+        },
+        {
+          id: "factory-email-block",
+          dataKey: "factoryAddress",
+          layout: "single",
+          showWhen: {
+            field: "companyAccommodationLocation",
+            operator: "eq",
+            value: "within-factory",
+          },
+          resetOn: LOCAL_ADDRESS_RESET_ON,
+          fields: [
+            {
+              name: "factoryEmail",
+              type: "email",
+              label: "Email",
+              placeholder: "Email",
             },
           ],
         },
@@ -416,11 +616,7 @@ export const securityClearanceFormConfig: StepFormConfig = {
           layout: "single",
           showWhen: {
             or: [
-              {
-                field: "accommodationType",
-                operator: "eq",
-                value: "self-arrangement",
-              },
+              { field: "selfAccommodationStatus", operator: "truthy" },
               {
                 field: "companyAccommodationStatus",
                 operator: "eq",
@@ -428,6 +624,12 @@ export const securityClearanceFormConfig: StepFormConfig = {
               },
             ],
           },
+          resetOn: [
+            "accommodationType",
+            "selfAccommodationStatus",
+            "companyAccommodationStatus",
+            "companyAccommodationLocation",
+          ],
           fields: [
             {
               name: "rentalAgreement",
@@ -435,7 +637,6 @@ export const securityClearanceFormConfig: StepFormConfig = {
               label: "Rental Agreement / Rental Contract / Rental Proof",
               accept: ["pdf", "jpg", "png"],
               maxSizeMB: 10,
-              required: false,
             },
           ],
         },
@@ -449,12 +650,12 @@ export const securityClearanceFormConfig: StepFormConfig = {
             operator: "eq",
             value: "temporary",
           },
+          resetOn: ["accommodationType", "selfAccommodationStatus"],
           fields: [
             {
               name: "expectedRegularDate",
               type: "date",
               label: "Expected Date for Regular Residence",
-              required: false,
             },
           ],
         },
@@ -491,12 +692,16 @@ export const securityClearanceFormConfig: StepFormConfig = {
         },
         {
           id: "previous-passport-details-block",
-          dataKey: "passportInfo",
           layout: "2-col",
           showWhen: {
             field: "hasPreviousPassport",
             operator: "eq",
             value: "yes",
+          },
+          repeatable: {
+            arrayName: "passports",
+            minItems: 1,
+            addLabel: "+ Add Another Passport",
           },
           fields: [
             {
@@ -504,28 +709,24 @@ export const securityClearanceFormConfig: StepFormConfig = {
               type: "text",
               label: "Passport No.",
               placeholder: "Passport No.",
-              required: false,
             },
             {
               name: "passportPersonalNo",
               type: "text",
               label: "Personal No.",
               placeholder: "Personal No.",
-              required: false,
             },
             {
               name: "passportNationality",
               type: "text",
               label: "Nationality",
               placeholder: "Enter nationality",
-              required: false,
             },
             {
               name: "passportIssuingAuthority",
               type: "text",
               label: "Issuing Authority",
               placeholder: "Issuing Authority",
-              required: false,
             },
           ],
         },
@@ -553,6 +754,7 @@ export const securityClearanceFormConfig: StepFormConfig = {
                 "Passport of the Employees/Expatriates/Investor (Whole of the used part)",
               accept: ["pdf", "jpg", "png"],
               maxSizeMB: 10,
+              fileVariant: "inline",
             },
             {
               name: "attachAppointmentLetter",
@@ -561,6 +763,7 @@ export const securityClearanceFormConfig: StepFormConfig = {
                 "Appointment Letter/transfer order/service contract or agreement for expatriates/investors.",
               accept: ["pdf", "jpg", "png"],
               maxSizeMB: 10,
+              fileVariant: "inline",
             },
             {
               name: "attachCV",
@@ -569,6 +772,7 @@ export const securityClearanceFormConfig: StepFormConfig = {
                 "Copies of curriculum vitae (CV). All academic qualification & professional experience certificate for the employee",
               accept: ["pdf", "jpg", "png"],
               maxSizeMB: 10,
+              fileVariant: "inline",
             },
             {
               name: "attachTradeLicense",
@@ -576,6 +780,7 @@ export const securityClearanceFormConfig: StepFormConfig = {
               label: "Up to date Trade License",
               accept: ["pdf", "jpg", "png"],
               maxSizeMB: 10,
+              fileVariant: "inline",
             },
             {
               name: "attachIncomeTax",
@@ -584,6 +789,7 @@ export const securityClearanceFormConfig: StepFormConfig = {
                 "Up-to-date income tax clearance certificate (Organization)",
               accept: ["pdf", "jpg", "png"],
               maxSizeMB: 10,
+              fileVariant: "inline",
             },
             {
               name: "attachActivities",
@@ -592,6 +798,7 @@ export const securityClearanceFormConfig: StepFormConfig = {
                 "Specific activities of the organization (On company letterhead)",
               accept: ["pdf", "jpg", "png"],
               maxSizeMB: 10,
+              fileVariant: "inline",
             },
             {
               name: "attachManpowerStatement",
@@ -600,6 +807,7 @@ export const securityClearanceFormConfig: StepFormConfig = {
                 "Statement of the manpower showing list of local & expatriate personnel employed with designation, salary break-up, nationality and date of first appointment",
               accept: ["pdf", "jpg", "png"],
               maxSizeMB: 10,
+              fileVariant: "inline",
             },
             // Items 8–11: optional ("if any" / "applicable for investors")
             {

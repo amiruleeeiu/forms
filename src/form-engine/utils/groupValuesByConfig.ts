@@ -24,6 +24,19 @@ export function groupValuesByConfig(
     const stepData: Record<string, unknown> = {};
 
     for (const block of step.blocks) {
+      // Repeatable block: the array lives at values[arrayName] directly.
+      if (block.repeatable) {
+        const { arrayName } = block.repeatable;
+        if (Object.prototype.hasOwnProperty.call(values, arrayName)) {
+          if (block.dataKey) {
+            stepData[block.dataKey] = values[arrayName];
+          } else {
+            stepData[arrayName] = values[arrayName];
+          }
+        }
+        continue;
+      }
+
       const blockData: Record<string, unknown> = {};
 
       for (const field of block.fields) {

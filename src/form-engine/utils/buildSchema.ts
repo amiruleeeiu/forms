@@ -36,18 +36,13 @@ function buildFieldSchema(field: FieldConfig): z.ZodTypeAny {
 
   // ---- date ----
   if (field.type === "date") {
-    const s = z.date({
-      required_error: msgs.required ?? `${field.label} is required`,
-      invalid_type_error: "Invalid date",
-    });
+    const s = z.date({ error: msgs.required ?? `${field.label} is required` });
     return isRequired ? s : s.optional();
   }
 
   // ---- number ----
   if (field.type === "number") {
-    let s = z.coerce.number({
-      invalid_type_error: `${field.label} must be a number`,
-    });
+    let s = z.coerce.number({ error: `${field.label} must be a number` });
     const minVal = field.min;
     const maxVal = field.max;
     if (minVal !== undefined) s = s.min(minVal, `Minimum value is ${minVal}`);
@@ -145,6 +140,47 @@ function collectAllFields(
   return config.steps.flatMap((step) => step.blocks.flatMap((b) => b.fields));
 }
 
+/** Wraps any Zod schema as optional — no-op if already optional. */
+function makeOptional(schema: z.ZodTypeAny): z.ZodTypeAny {
+  return schema instanceof z.ZodOptional ? schema : schema.optional();
+}
+
+/**
+ * Wraps a schema so that empty/absent values ("", null, [], false for
+ * checkboxes) are coerced to undefined and accepted as "not provided".
+ * This is needed for conditional fields whose RHF default value ("", null,
+ * false, []) would otherwise fail a required schema rule.
+ */
+function makeConditionalOptional(schema: z.ZodTypeAny): z.ZodTypeAny {
+  return z.preprocess((val) => {
+    if (val === "" || val === null || val === undefined) return undefined;
+    if (Array.isArray(val) && val.length === 0) return undefined;
+    return val;
+  }, makeOptional(schema));
+}
+
+/**
+ * Same as makeConditionalOptional but also treats an array whose every item
+ * is all-empty (all field values are "", null, or undefined — the seed state
+ * from buildDefaultValues) as absent. This handles conditional repeatable
+ * blocks where the default is [{field:"",…}] rather than [].
+ */
+function makeConditionalRepeatableOptional(schema: z.ZodTypeAny): z.ZodTypeAny {
+  return z.preprocess((val) => {
+    if (!Array.isArray(val) || val.length === 0) return undefined;
+    const allEmpty = val.every(
+      (item) =>
+        item !== null &&
+        typeof item === "object" &&
+        Object.values(item as Record<string, unknown>).every(
+          (v) => v === "" || v === null || v === undefined || v === false,
+        ),
+    );
+    if (allEmpty) return undefined;
+    return val;
+  }, makeOptional(schema));
+}
+
 // ---------------------------------------------------------------------------
 // Public: buildSchemaFromConfig
 // ---------------------------------------------------------------------------
@@ -170,16 +206,78 @@ function collectAllFields(
 export function buildSchemaFromConfig(
   config: NormalFormConfig | StepFormConfig,
 ): z.ZodObject<z.ZodRawShape> {
-  const shape: z.ZodRawShape = {};
-  for (const field of collectAllFields(config)) {
-    shape[field.name] = buildFieldSchema(field);
-  }
-  return z.object(shape);
-}
+  const shape: Record<string, z.ZodTypeAny> = {};
 
+  const blocks =
+    config.mode === "normal"
+      ? config.blocks
+      : config.steps.flatMap((s) => s.blocks);
+
+  for (const block of blocks) {
+    const blockIsConditional = !!(block.showWhen || block.hideWhen);
+
+    // ---- Repeatable block: builds z.array(z.object({...})) ----
+    if (block.repeatable) {
+      const { arrayName, minItems = 0 } = block.repeatable;
+      if (arrayName in shape) continue;
+      const subShape: Record<string, z.ZodTypeAny> = {};
+      for (const field of block.fields) {
+        subShape[field.name] = buildFieldSchema(field);
+      }
+      const itemSchema = z.object(subShape as z.ZodRawShape);
+      let arraySchema: z.ZodTypeAny = z.array(itemSchema);
+      if (minItems > 0) {
+        arraySchema = (arraySchema as z.ZodArray<typeof itemSchema>).min(
+          minItems,
+          `At least ${minItems} entry required`,
+        );
+      }
+      shape[arrayName] = blockIsConditional
+        ? makeConditionalRepeatableOptional(arraySchema)
+        : arraySchema;
+      continue;
+    }
+
+    for (const field of block.fields) {
+      // First block definition wins — shared field arrays (e.g. address fields
+      // reused across multiple conditional blocks) get registered only once.
+      if (field.name in shape) continue;
+
+      const isConditional =
+        blockIsConditional || !!(field.showWhen || field.hideWhen);
+
+      let fieldSchema = buildFieldSchema(field);
+
+      // Fields inside conditional blocks may not be visible at submission time.
+      // Make them optional in the Zod schema so hidden fields never block
+      // form.trigger(). The required asterisk / UX enforcement still happens
+      // in the UI via the `required` prop on the field component.
+      if (isConditional) fieldSchema = makeConditionalOptional(fieldSchema);
+
+      shape[field.name] = fieldSchema;
+    }
+  }
+
+  return z.object(shape as z.ZodRawShape);
+}
 // ---------------------------------------------------------------------------
-// Public: buildDefaultValues
-// ---------------------------------------------------------------------------
+
+/** Returns the empty default value for a single field (used for repeatable item seeding). */
+export function buildFieldDefaultValue(field: FieldConfig): unknown {
+  switch (field.type) {
+    case "checkbox":
+      return false;
+    case "checkbox-group":
+      return [];
+    case "file":
+      return null;
+    case "number":
+    case "date":
+      return undefined;
+    default:
+      return "";
+  }
+}
 
 /**
  * Derives empty default values from a form config so you don't need to
@@ -194,24 +292,30 @@ export function buildDefaultValues(
   config: NormalFormConfig | StepFormConfig,
 ): Record<string, unknown> {
   const defaults: Record<string, unknown> = {};
-  for (const field of collectAllFields(config)) {
-    switch (field.type) {
-      case "checkbox":
-        defaults[field.name] = false;
-        break;
-      case "checkbox-group":
-        defaults[field.name] = [];
-        break;
-      case "file":
-        defaults[field.name] = null;
-        break;
-      case "number":
-      case "date":
-        defaults[field.name] = undefined;
-        break;
-      default:
-        defaults[field.name] = "";
+
+  const blocks =
+    config.mode === "normal"
+      ? config.blocks
+      : config.steps.flatMap((s) => s.blocks);
+
+  for (const block of blocks) {
+    // Repeatable block: seed with one empty item
+    if (block.repeatable) {
+      const { arrayName } = block.repeatable;
+      if (arrayName in defaults) continue;
+      const itemDefaults: Record<string, unknown> = {};
+      for (const field of block.fields) {
+        itemDefaults[field.name] = buildFieldDefaultValue(field);
+      }
+      defaults[arrayName] = [itemDefaults];
+      continue;
+    }
+
+    for (const field of block.fields) {
+      if (field.name in defaults) continue;
+      defaults[field.name] = buildFieldDefaultValue(field);
     }
   }
+
   return defaults;
 }

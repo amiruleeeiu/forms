@@ -27,6 +27,12 @@ interface FileUploadFieldProps<
   maxSizeMB?: number;
   /** Allow multiple files (defaults to false) */
   multiple?: boolean;
+  /**
+   * Upload style.
+   * - "dropzone" (default): drag-and-drop zone
+   * - "inline": compact single-row "Choose File" button
+   */
+  variant?: "dropzone" | "inline";
 }
 
 function FileUploadField<TFieldValues extends FieldValues>({
@@ -38,6 +44,7 @@ function FileUploadField<TFieldValues extends FieldValues>({
   accept,
   maxSizeMB,
   multiple = false,
+  variant = "dropzone",
 }: FileUploadFieldProps<TFieldValues>) {
   const { control } = useFormContext<TFieldValues>();
   const { field, fieldState } = useController({ name, control });
@@ -112,57 +119,110 @@ function FileUploadField<TFieldValues extends FieldValues>({
           {required && <span className="ml-0.5 text-destructive">*</span>}
         </FormLabel>
         <FormControl>
-          <div
-            role="button"
-            tabIndex={disabled ? -1 : 0}
-            aria-disabled={disabled}
-            aria-required={required}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            onClick={() => !disabled && inputRef.current?.click()}
-            onKeyDown={(e) => {
-              if ((e.key === "Enter" || e.key === " ") && !disabled) {
-                inputRef.current?.click();
-              }
-            }}
-            className={cn(
-              "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed px-4 py-6 text-center transition-colors",
-              hasError
-                ? "border-destructive bg-destructive/5"
-                : "border-input hover:border-primary/50 hover:bg-muted/40",
-              disabled && "cursor-not-allowed opacity-50",
-            )}
-          >
-            <UploadCloudIcon className="h-8 w-8 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">
-              Drag &amp; drop files here, or{" "}
-              <span className="font-medium text-primary underline-offset-2 hover:underline">
-                click to select
+          {variant === "inline" ? (
+            /* ---- Inline variant: compact "Choose File" row ---- */
+            <div
+              className={cn(
+                "flex items-center gap-3",
+                disabled && "cursor-not-allowed opacity-50",
+              )}
+            >
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={() => !disabled && inputRef.current?.click()}
+                aria-required={required}
+                className={cn(
+                  "inline-flex shrink-0 items-center gap-1.5 rounded border border-input bg-background px-3 py-1.5 text-sm font-medium shadow-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                  hasError && "border-destructive text-destructive",
+                  disabled && "pointer-events-none",
+                )}
+              >
+                Choose File
+              </button>
+              <span className="truncate text-sm text-muted-foreground">
+                {files.length === 0
+                  ? "No file chosen"
+                  : files.length === 1
+                    ? files[0].name
+                    : `${files.length} files`}
               </span>
-            </p>
-            {acceptDisplay && (
-              <p className="text-xs text-muted-foreground">
-                Accepted: {acceptDisplay}
+              {files.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => removeFile()}
+                  disabled={disabled}
+                  aria-label="Remove file"
+                  className="ml-auto shrink-0 rounded-sm p-0.5 text-muted-foreground hover:text-destructive focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-destructive"
+                >
+                  <XIcon className="h-3.5 w-3.5" />
+                </button>
+              )}
+              <input
+                ref={inputRef}
+                type="file"
+                accept={acceptAttr}
+                multiple={multiple}
+                disabled={disabled}
+                onChange={handleInputChange}
+                className="sr-only"
+                aria-hidden="true"
+              />
+            </div>
+          ) : (
+            /* ---- Dropzone variant (default) ---- */
+            <div
+              role="button"
+              tabIndex={disabled ? -1 : 0}
+              aria-disabled={disabled}
+              aria-required={required}
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onClick={() => !disabled && inputRef.current?.click()}
+              onKeyDown={(e) => {
+                if ((e.key === "Enter" || e.key === " ") && !disabled) {
+                  inputRef.current?.click();
+                }
+              }}
+              className={cn(
+                "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed px-4 py-6 text-center transition-colors",
+                hasError
+                  ? "border-destructive bg-destructive/5"
+                  : "border-input hover:border-primary/50 hover:bg-muted/40",
+                disabled && "cursor-not-allowed opacity-50",
+              )}
+            >
+              <UploadCloudIcon className="h-8 w-8 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">
+                Drag &amp; drop files here, or{" "}
+                <span className="font-medium text-primary underline-offset-2 hover:underline">
+                  click to select
+                </span>
               </p>
-            )}
-            {maxSizeMB && (
-              <p className="text-xs text-muted-foreground">
-                Max size: {maxSizeMB}.00MB
-              </p>
-            )}
-            <input
-              ref={inputRef}
-              type="file"
-              accept={acceptAttr}
-              multiple={multiple}
-              disabled={disabled}
-              onChange={handleInputChange}
-              className="sr-only"
-              aria-hidden="true"
-            />
-          </div>
+              {acceptDisplay && (
+                <p className="text-xs text-muted-foreground">
+                  Accepted: {acceptDisplay}
+                </p>
+              )}
+              {maxSizeMB && (
+                <p className="text-xs text-muted-foreground">
+                  Max size: {maxSizeMB}.00MB
+                </p>
+              )}
+              <input
+                ref={inputRef}
+                type="file"
+                accept={acceptAttr}
+                multiple={multiple}
+                disabled={disabled}
+                onChange={handleInputChange}
+                className="sr-only"
+                aria-hidden="true"
+              />
+            </div>
+          )}
         </FormControl>
-        {files.length > 0 && (
+        {variant === "dropzone" && files.length > 0 && (
           <ul className="mt-2 space-y-1">
             {files.map((file, i) => (
               <li

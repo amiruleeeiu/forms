@@ -136,6 +136,17 @@ export type FieldConfig = {
    * Used by buildSchemaFromConfig() to derive the Zod schema automatically.
    */
   validation?: FieldValidation;
+  /**
+   * File upload display style.
+   * - "dropzone" (default): drag-and-drop zone with cloud icon
+   * - "inline": compact single-row "Choose File" button
+   */
+  fileVariant?: "dropzone" | "inline";
+  /**
+   * Sample value injected when the dev-mode "Import" button is clicked.
+   * If omitted, a sensible value is auto-generated from the field type.
+   */
+  devSampleValue?: unknown;
 };
 
 // ---------------------------------------------------------------------------
@@ -159,6 +170,24 @@ export type BlockConfig = {
   fields: FieldConfig[];
   showWhen?: ConditionExpr;
   hideWhen?: ConditionExpr;
+  /**
+   * When any of these field names change value, all fields in this block
+   * are reset to their default values (cascade reset).
+   * The watcher stays mounted even when the block is hidden.
+   */
+  resetOn?: string[];
+  /**
+   * When set, renders this block as a repeatable list with add / remove
+   * controls using React Hook Form's useFieldArray.
+   */
+  repeatable?: {
+    /** RHF field-array name — the array key in form values. */
+    arrayName: string;
+    /** Minimum rows (cannot remove below this). Default 0. */
+    minItems?: number;
+    /** Label for the add-item button. Default "+  Add Another". */
+    addLabel?: string;
+  };
 };
 
 // ---------------------------------------------------------------------------
