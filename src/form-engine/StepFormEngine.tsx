@@ -117,7 +117,10 @@ export function StepFormEngine<TFieldValues extends FieldValues>({
   const importDevData = () => {
     if (sampleData) {
       // Fill all steps at once by merging sample data over defaults.
-      form.reset({ ...resolvedDefaults, ...sampleData } as DefaultValues<TFieldValues>);
+      form.reset({
+        ...resolvedDefaults,
+        ...sampleData,
+      } as DefaultValues<TFieldValues>);
     } else {
       const sample = getStepDevData(activeStep);
       for (const [key, value] of Object.entries(sample)) {
@@ -137,10 +140,7 @@ export function StepFormEngine<TFieldValues extends FieldValues>({
           // Prevent Enter in input fields from triggering implicit form
           // submission, which would run zodResolver on all fields and
           // pre-populate errors for steps not yet visited.
-          if (
-            e.key === "Enter" &&
-            e.target instanceof HTMLInputElement
-          ) {
+          if (e.key === "Enter" && e.target instanceof HTMLInputElement) {
             e.preventDefault();
           }
         }}
