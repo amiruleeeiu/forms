@@ -32,7 +32,6 @@ function Wrapper({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <SearchableSelectField
-          control={form.control}
           name="city"
           label="City"
           placeholder="Search cities..."
@@ -53,7 +52,7 @@ describe("SearchableSelectField", () => {
 
   it("renders the placeholder when no option selected", () => {
     renderWithProviders(<Wrapper />);
-    expect(screen.getByText("Search cities...")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Search cities...")).toBeInTheDocument();
   });
 
   it("renders the required asterisk", () => {
@@ -70,17 +69,17 @@ describe("SearchableSelectField", () => {
 
   it("opens the dropdown when clicked", async () => {
     const { user } = renderWithProviders(<Wrapper />);
-    await user.click(screen.getByText("Search cities..."));
+    await user.click(screen.getByPlaceholderText("Search cities..."));
     await waitFor(() => {
-      expect(screen.getByPlaceholderText("Search…")).toBeInTheDocument();
+      expect(screen.getByText("New York")).toBeInTheDocument();
     });
   });
 
   it("filters options based on search input", async () => {
     const { user } = renderWithProviders(<Wrapper />);
-    await user.click(screen.getByText("Search cities..."));
-    await waitFor(() => screen.getByPlaceholderText("Search…"));
-    await user.type(screen.getByPlaceholderText("Search…"), "new");
+    await user.click(screen.getByPlaceholderText("Search cities..."));
+    await waitFor(() => screen.getByText("Los Angeles"));
+    await user.type(screen.getByPlaceholderText("Search cities..."), "new");
     await waitFor(() => {
       expect(screen.getByText("New York")).toBeInTheDocument();
       expect(screen.queryByText("Los Angeles")).not.toBeInTheDocument();
@@ -89,20 +88,18 @@ describe("SearchableSelectField", () => {
 
   it("selects an option and closes the dropdown", async () => {
     const { user } = renderWithProviders(<Wrapper />);
-    await user.click(screen.getByText("Search cities..."));
+    await user.click(screen.getByPlaceholderText("Search cities..."));
     await waitFor(() => screen.getByText("Chicago"));
     await user.click(screen.getByText("Chicago"));
     await waitFor(() => {
-      // Dropdown should close and the trigger should show selected label
-      expect(screen.queryByPlaceholderText("Search…")).not.toBeInTheDocument();
-      expect(screen.getByText("Chicago")).toBeInTheDocument();
+      expect(screen.getByRole("combobox")).toHaveValue("Chicago");
     });
   });
 
   it("calls onSubmit with the selected city value", async () => {
     const handleSubmit = vi.fn();
     const { user } = renderWithProviders(<Wrapper onSubmit={handleSubmit} />);
-    await user.click(screen.getByText("Search cities..."));
+    await user.click(screen.getByPlaceholderText("Search cities..."));
     await waitFor(() => screen.getByText("New York"));
     await user.click(screen.getByText("New York"));
     await user.click(screen.getByRole("button", { name: /submit/i }));

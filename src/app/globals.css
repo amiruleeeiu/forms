@@ -128,3 +128,28 @@
     @apply font-sans;
   }
 }
+
+/* ── Phone input (react-phone-number-input) overrides ─────────────────────── */
+.phone-input-wrapper .PhoneInputCountry {
+  @apply flex items-center gap-1 border-r border-input px-2.5;
+  margin: 0;
+}
+
+.phone-input-wrapper .PhoneInputCountrySelectArrow {
+  width: 0.35rem;
+  height: 0.35rem;
+  border-width: 0 1.5px 1.5px 0;
+  @apply opacity-50;
+}
+
+.phone-input-wrapper .PhoneInputCountrySelect {
+  @apply absolute inset-0 cursor-pointer opacity-0;
+}
+
+.phone-input-wrapper .PhoneInputCountryFlag {
+  @apply h-3.5 w-5 overflow-hidden rounded-[2px];
+}
+
+.phone-input-wrapper .PhoneInputCountryFlag img {
+  @apply h-full w-full object-cover;
+}

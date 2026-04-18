@@ -1,4 +1,4 @@
-import type { Control, FieldPath, FieldValues } from "react-hook-form";
+import type { FieldPath, FieldValues } from "react-hook-form";
 
 /**
  * Base props shared by every reusable field component.
@@ -7,8 +7,6 @@ import type { Control, FieldPath, FieldValues } from "react-hook-form";
 export interface BaseFieldProps<
   TFieldValues extends FieldValues = FieldValues,
 > {
-  /** RHF control object from useForm() */
-  control: Control<TFieldValues>;
   /** Dot-path name matching the schema key (e.g. "name", "address.city") */
   name: FieldPath<TFieldValues>;
   /** Visible label text */

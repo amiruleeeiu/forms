@@ -25,7 +25,6 @@ function Wrapper({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <CheckboxField
-          control={form.control}
           name="acceptTerms"
           label="I accept the terms and conditions"
           required

@@ -200,6 +200,7 @@ export {
   FormControl,
   FormDescription,
   FormField,
+  FormFieldContext,
   FormItem,
   FormLabel,
   FormMessage,

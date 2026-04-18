@@ -25,7 +25,6 @@ function Wrapper({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <DatePickerField
-          control={form.control}
           name="dob"
           label="Date of Birth"
           placeholder="Pick a date"

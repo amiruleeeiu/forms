@@ -33,7 +33,6 @@ function Wrapper({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <RadioGroupField
-          control={form.control}
           name="gender"
           label="Gender"
           options={GENDERS}

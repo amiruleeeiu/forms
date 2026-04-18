@@ -32,7 +32,6 @@ function Wrapper({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <SelectField
-          control={form.control}
           name="country"
           label="Country"
           placeholder="Select a country"

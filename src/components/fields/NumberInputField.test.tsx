@@ -28,7 +28,6 @@ function Wrapper({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <NumberInputField
-          control={form.control}
           name="age"
           label="Age"
           placeholder="Enter age"

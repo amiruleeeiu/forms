@@ -3,35 +3,42 @@
 import {
   FormControl,
   FormDescription,
-  FormField,
+  FormFieldContext,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import React, { forwardRef } from "react";
-import { type FieldValues } from "react-hook-form";
+import {
+  type FieldValues,
+  useController,
+  useFormContext,
+} from "react-hook-form";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import type { BaseFieldProps } from "./types";
 
-// A shadcn-styled input that react-phone-number-input passes its props into
+// A plain <input> that react-phone-number-input injects its props into,
+// styled to sit flush inside the wrapper (no own border/ring).
 const PhoneInputComponent = forwardRef<
   HTMLInputElement,
   React.ComponentPropsWithoutRef<"input">
 >(function PhoneInputComponent({ className, ...props }, ref) {
   return (
-    <Input
+    <input
       ref={ref}
-      className={cn("rounded-l-none border-l-0", className)}
+      className={cn(
+        "h-full min-w-0 flex-1 bg-transparent px-2.5 text-sm outline-none",
+        "placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
+        className,
+      )}
       {...props}
     />
   );
 });
 
 function PhoneInputField<TFieldValues extends FieldValues>({
-  control,
   name,
   label,
   placeholder = "Enter phone number",
@@ -39,37 +46,39 @@ function PhoneInputField<TFieldValues extends FieldValues>({
   disabled,
   description,
 }: BaseFieldProps<TFieldValues>) {
+  const { control } = useFormContext<TFieldValues>();
+  const { field, fieldState } = useController({ name, control });
+
   return (
-    <FormField
-      control={control}
-      name={name}
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>
-            {label}
-            {required && <span className="ml-0.5 text-destructive">*</span>}
-          </FormLabel>
-          <FormControl>
-            {/* PhoneInput renders a <div> but FormControl only clones the direct element */}
-            <div aria-required={required ? true : undefined}>
-              <PhoneInput
-                international
-                defaultCountry="US"
-                placeholder={placeholder}
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                disabled={disabled}
-                inputComponent={PhoneInputComponent}
-                className="phone-input-wrapper flex h-8 w-full rounded-lg border border-input bg-transparent"
-              />
-            </div>
-          </FormControl>
-          {description && <FormDescription>{description}</FormDescription>}
-          <FormMessage />
-        </FormItem>
-      )}
-    />
+    <FormFieldContext.Provider value={{ name }}>
+      <FormItem>
+        <FormLabel>
+          {label}
+          {required && <span className="ml-0.5 text-destructive">*</span>}
+        </FormLabel>
+        <FormControl>
+          {/* PhoneInput renders a <div> — wrap to keep FormControl happy */}
+          <div aria-required={required ? true : undefined}>
+            <PhoneInput
+              international
+              defaultCountry="BD"
+              placeholder={placeholder}
+              value={field.value ?? ""}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              disabled={disabled}
+              inputComponent={PhoneInputComponent}
+              className={cn(
+                "phone-input-wrapper flex h-8 w-full items-center rounded border bg-transparent transition-colors",
+                fieldState.error ? "border-destructive" : "border-input",
+              )}
+            />
+          </div>
+        </FormControl>
+        {description && <FormDescription>{description}</FormDescription>}
+        <FormMessage />
+      </FormItem>
+    </FormFieldContext.Provider>
   );
 }
 

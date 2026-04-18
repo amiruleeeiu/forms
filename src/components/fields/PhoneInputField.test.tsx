@@ -29,12 +29,7 @@ function Wrapper({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <PhoneInputField
-          control={form.control}
-          name="phone"
-          label="Phone Number"
-          required
-        />
+        <PhoneInputField name="phone" label="Phone Number" required />
         <button type="submit">Submit</button>
       </form>
     </Form>

@@ -90,6 +90,7 @@ export const SKILL_OPTIONS = [
 
 export const EXAMPLE_FORM_DEFAULTS: Partial<ExampleFormValues> = {
   name: "",
+  phone: "",
   skills: [],
   country: "",
   city: "",

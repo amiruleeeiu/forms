@@ -28,7 +28,6 @@ function Wrapper({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <TextInputField
-          control={form.control}
           name="name"
           label="Full Name"
           placeholder="Enter your name"

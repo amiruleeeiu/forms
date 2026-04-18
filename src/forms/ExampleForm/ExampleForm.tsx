@@ -83,7 +83,6 @@ export function ExampleForm() {
           </legend>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <TextInputField
-              control={form.control}
               name="name"
               label="Full Name"
               placeholder="Jane Doe"
@@ -91,7 +90,6 @@ export function ExampleForm() {
               autoComplete="name"
             />
             <NumberInputField
-              control={form.control}
               name="age"
               label="Age"
               placeholder="25"
@@ -103,7 +101,6 @@ export function ExampleForm() {
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <DatePickerField
-              control={form.control}
               name="dateOfBirth"
               label="Date of Birth"
               placeholder="Pick a date"
@@ -111,7 +108,6 @@ export function ExampleForm() {
               maxDate={new Date()}
             />
             <PhoneInputField
-              control={form.control}
               name="phone"
               label="Phone Number"
               placeholder="+1 555 123 4567"
@@ -124,14 +120,12 @@ export function ExampleForm() {
         <fieldset className="flex flex-col gap-4">
           <legend className="mb-2 text-base font-semibold">Identity</legend>
           <RadioGroupField
-            control={form.control}
             name="gender"
             label="Gender"
             options={GENDER_OPTIONS}
             required
           />
           <CheckboxGroupField
-            control={form.control}
             name="skills"
             label="Skills"
             options={SKILL_OPTIONS}
@@ -145,7 +139,6 @@ export function ExampleForm() {
           <legend className="mb-2 text-base font-semibold">Location</legend>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <SelectField
-              control={form.control}
               name="country"
               label="Country"
               placeholder="Select a country"
@@ -153,7 +146,6 @@ export function ExampleForm() {
               required
             />
             <SearchableSelectField
-              control={form.control}
               name="city"
               label="City"
               placeholder="Search cities…"
@@ -165,7 +157,6 @@ export function ExampleForm() {
 
         {/* Section: Terms */}
         <CheckboxField
-          control={form.control}
           name="acceptTerms"
           label="I agree to the Terms of Service and Privacy Policy"
           required

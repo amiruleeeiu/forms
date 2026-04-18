@@ -32,7 +32,6 @@ function Wrapper({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <CheckboxGroupField
-          control={form.control}
           name="skills"
           label="Skills"
           options={SKILLS}
