@@ -64,7 +64,7 @@ function PhoneInputField<TFieldValues extends FieldValues>({
               defaultCountry="BD"
               placeholder={placeholder}
               value={field.value ?? ""}
-              onChange={field.onChange}
+              onChange={(val) => field.onChange(val ?? "")}
               onBlur={field.onBlur}
               disabled={disabled}
               inputComponent={PhoneInputComponent}

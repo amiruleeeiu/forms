@@ -40,6 +40,12 @@ function SelectField<TFieldValues extends FieldValues>({
   const { control } = useFormContext<TFieldValues>();
   const { field } = useController({ name, control });
 
+  // When the dropdown closes, mark the field as touched so RHF's
+  // onTouched/onBlur mode fires validation and clears stale errors.
+  function handleOpenChange(open: boolean) {
+    if (!open) field.onBlur();
+  }
+
   return (
     <FormFieldContext.Provider value={{ name }}>
       <FormItem>
@@ -50,6 +56,7 @@ function SelectField<TFieldValues extends FieldValues>({
         <Select
           value={field.value ?? ""}
           onValueChange={field.onChange}
+          onOpenChange={handleOpenChange}
           disabled={disabled}
         >
           <FormControl>
