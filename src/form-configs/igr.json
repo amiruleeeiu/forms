@@ -1,0 +1,533 @@
+{
+  "slug": "igr",
+  "title": "Deed Registration of IGR",
+  "serviceName": "deed-registration-igr",
+  "stakeholderCode": "IGR-001",
+  "mode": "stepped",
+  "submitLabel": "Preview & Submit",
+  "steps": [
+    {
+      "id": "step-basic-info",
+      "dataKey": "basicInfo",
+      "title": "Basic Information",
+      "blocks": [
+        {
+          "id": "basic-info-block",
+          "title": "Basic Information",
+          "layout": "2-col",
+          "fields": [
+            {
+              "name": "organizationName",
+              "type": "text",
+              "label": "Organization Name",
+              "placeholder": "Ulkasemi Ltd."
+            },
+            {
+              "name": "authorizedPersonName",
+              "type": "text",
+              "label": "Authorized Person Name",
+              "placeholder": "Karibul Hasan"
+            },
+            {
+              "name": "authorizedPersonMobile",
+              "type": "phone",
+              "label": "Authorized Person Mobile No"
+            },
+            {
+              "name": "email",
+              "type": "email",
+              "label": "Email",
+              "placeholder": "Enter email address"
+            },
+            {
+              "name": "nidNumber",
+              "type": "text",
+              "label": "NID Number",
+              "placeholder": "6454012748"
+            },
+            {
+              "name": "address",
+              "type": "text",
+              "label": "Address",
+              "placeholder": "Enter full address"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "step-application",
+      "dataKey": "applicationDetails",
+      "title": "Application for Deed Registration",
+      "blocks": [
+        {
+          "id": "draft-deed-block",
+          "title": "Draft Deed Details",
+          "layout": "2-col",
+          "fields": [
+            {
+              "name": "draftDeedPostCode",
+              "type": "text",
+              "label": "Post Code",
+              "placeholder": "Enter"
+            },
+            {
+              "name": "subRegistrarOffice",
+              "type": "select",
+              "label": "Sub-Registrar Office",
+              "placeholder": "Select One",
+              "options": {
+                "type": "static",
+                "items": [
+                  {
+                    "label": "Dhaka Sub-Registrar Office",
+                    "value": "dhaka-sro"
+                  },
+                  {
+                    "label": "Chittagong Sub-Registrar Office",
+                    "value": "chittagong-sro"
+                  },
+                  {
+                    "label": "Sylhet Sub-Registrar Office",
+                    "value": "sylhet-sro"
+                  },
+                  {
+                    "label": "Rajshahi Sub-Registrar Office",
+                    "value": "rajshahi-sro"
+                  },
+                  {
+                    "label": "Khulna Sub-Registrar Office",
+                    "value": "khulna-sro"
+                  },
+                  {
+                    "label": "Barisal Sub-Registrar Office",
+                    "value": "barisal-sro"
+                  },
+                  {
+                    "label": "Rangpur Sub-Registrar Office",
+                    "value": "rangpur-sro"
+                  },
+                  {
+                    "label": "Mymensingh Sub-Registrar Office",
+                    "value": "mymensingh-sro"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "mouza-info-block",
+          "title": "Mouza Information",
+          "layout": "2-col",
+          "repeatable": {
+            "arrayName": "mouzas",
+            "minItems": 1,
+            "addLabel": "+ Add New Mouza"
+          },
+          "fields": [
+            {
+              "name": "typeOfDeed",
+              "type": "select",
+              "label": "Type of Deed",
+              "placeholder": "Select One",
+              "options": {
+                "type": "static",
+                "items": [
+                  { "label": "Sale Deed", "value": "sale-deed" },
+                  { "label": "Gift Deed", "value": "gift-deed" },
+                  { "label": "Heba Deed", "value": "heba-deed" },
+                  { "label": "Exchange Deed", "value": "exchange-deed" },
+                  { "label": "Lease Deed", "value": "lease-deed" },
+                  { "label": "Mortgage Deed", "value": "mortgage-deed" },
+                  { "label": "Power of Attorney", "value": "power-of-attorney" }
+                ]
+              }
+            },
+            {
+              "name": "typeOfProperty",
+              "type": "select",
+              "label": "Type of Property",
+              "placeholder": "Select One",
+              "options": {
+                "type": "static",
+                "items": [
+                  {
+                    "label": "Agricultural Land",
+                    "value": "agricultural-land"
+                  },
+                  {
+                    "label": "Non-Agricultural Land",
+                    "value": "non-agricultural-land"
+                  },
+                  {
+                    "label": "Building / Apartment",
+                    "value": "building-apartment"
+                  },
+                  { "label": "Flat", "value": "flat" }
+                ]
+              }
+            },
+            {
+              "name": "postCode",
+              "type": "text",
+              "label": "Post Code",
+              "placeholder": "Enter"
+            },
+            {
+              "name": "division",
+              "type": "select",
+              "label": "Division",
+              "placeholder": "Select One",
+              "options": {
+                "type": "static",
+                "items": [
+                  { "label": "Dhaka", "value": "dhaka" },
+                  { "label": "Chittagong", "value": "chittagong" },
+                  { "label": "Sylhet", "value": "sylhet" },
+                  { "label": "Rajshahi", "value": "rajshahi" },
+                  { "label": "Khulna", "value": "khulna" },
+                  { "label": "Barisal", "value": "barisal" },
+                  { "label": "Rangpur", "value": "rangpur" },
+                  { "label": "Mymensingh", "value": "mymensingh" }
+                ]
+              }
+            },
+            {
+              "name": "district",
+              "type": "text",
+              "label": "District",
+              "placeholder": "Enter district"
+            },
+            {
+              "name": "thanaUpzila",
+              "type": "text",
+              "label": "Thana/Upzila",
+              "placeholder": "Enter thana / upzila"
+            },
+            {
+              "name": "mouzaNameJlNo",
+              "type": "text",
+              "label": "Mouza Name & J.L. No.",
+              "placeholder": "Enter mouza name and J.L. no."
+            },
+            {
+              "name": "khatianType",
+              "type": "select",
+              "label": "Khatian Type",
+              "placeholder": "Select One",
+              "options": {
+                "type": "static",
+                "items": [
+                  { "label": "RS", "value": "rs" },
+                  { "label": "BS", "value": "bs" },
+                  { "label": "CS", "value": "cs" },
+                  { "label": "SA", "value": "sa" },
+                  { "label": "BRS", "value": "brs" },
+                  { "label": "City Survey", "value": "city-survey" }
+                ]
+              }
+            },
+            {
+              "name": "khatianNumber",
+              "type": "text",
+              "label": "Khatian Number",
+              "placeholder": "Enter"
+            },
+            {
+              "name": "daagNumber",
+              "type": "text",
+              "label": "Daag Number",
+              "placeholder": "Enter"
+            }
+          ]
+        },
+        {
+          "id": "pay-order-block",
+          "title": "Pay-Order Information",
+          "layout": "2-col",
+          "repeatable": {
+            "arrayName": "payOrders",
+            "minItems": 1,
+            "addLabel": "+ Add New Pay-Order"
+          },
+          "fields": [
+            {
+              "name": "bankName",
+              "type": "select",
+              "label": "Bank Name",
+              "placeholder": "Select One",
+              "options": {
+                "type": "static",
+                "items": [
+                  { "label": "Sonali Bank", "value": "sonali-bank" },
+                  { "label": "Janata Bank", "value": "janata-bank" },
+                  { "label": "Agrani Bank", "value": "agrani-bank" },
+                  { "label": "Rupali Bank", "value": "rupali-bank" },
+                  {
+                    "label": "Dutch-Bangla Bank",
+                    "value": "dutch-bangla-bank"
+                  },
+                  { "label": "BRAC Bank", "value": "brac-bank" },
+                  { "label": "Islami Bank", "value": "islami-bank" },
+                  { "label": "Prime Bank", "value": "prime-bank" },
+                  { "label": "Eastern Bank", "value": "eastern-bank" }
+                ]
+              }
+            },
+            {
+              "name": "district",
+              "type": "text",
+              "label": "District",
+              "placeholder": "Enter district"
+            },
+            {
+              "name": "bankBranch",
+              "type": "text",
+              "label": "Bank Branch",
+              "placeholder": "Enter branch name"
+            },
+            {
+              "name": "payOrderType",
+              "type": "select",
+              "label": "Pay-Order Type",
+              "placeholder": "Select One",
+              "options": {
+                "type": "static",
+                "items": [
+                  { "label": "Pay Order", "value": "pay-order" },
+                  { "label": "Demand Draft", "value": "demand-draft" },
+                  { "label": "Banker's Cheque", "value": "bankers-cheque" }
+                ]
+              }
+            },
+            {
+              "name": "payOrderNumber",
+              "type": "text",
+              "label": "Pay-Order Number",
+              "placeholder": "Enter"
+            },
+            {
+              "name": "payOrderDate",
+              "type": "date",
+              "label": "Pay-Order Number Date"
+            },
+            {
+              "name": "payOrderAttachment",
+              "type": "file",
+              "label": "Pay-Order Attachment",
+              "accept": ["pdf"],
+              "maxSizeMB": 10
+            }
+          ]
+        },
+        {
+          "id": "challan-slip-block",
+          "title": "Challan Slip Details",
+          "layout": "2-col",
+          "repeatable": {
+            "arrayName": "challans",
+            "minItems": 1,
+            "addLabel": "+ Add New Challan"
+          },
+          "fields": [
+            {
+              "name": "bankName",
+              "type": "select",
+              "label": "Bank Name",
+              "placeholder": "Select One",
+              "options": {
+                "type": "static",
+                "items": [
+                  { "label": "Sonali Bank", "value": "sonali-bank" },
+                  { "label": "Janata Bank", "value": "janata-bank" },
+                  { "label": "Agrani Bank", "value": "agrani-bank" },
+                  { "label": "Rupali Bank", "value": "rupali-bank" },
+                  {
+                    "label": "Dutch-Bangla Bank",
+                    "value": "dutch-bangla-bank"
+                  },
+                  { "label": "BRAC Bank", "value": "brac-bank" },
+                  { "label": "Islami Bank", "value": "islami-bank" },
+                  { "label": "Prime Bank", "value": "prime-bank" },
+                  { "label": "Eastern Bank", "value": "eastern-bank" }
+                ]
+              }
+            },
+            {
+              "name": "district",
+              "type": "text",
+              "label": "District",
+              "placeholder": "Enter district"
+            },
+            {
+              "name": "bankBranch",
+              "type": "text",
+              "label": "Bank Branch",
+              "placeholder": "Enter branch name"
+            },
+            {
+              "name": "challanNumber",
+              "type": "text",
+              "label": "Challan Number",
+              "placeholder": "Enter"
+            },
+            {
+              "name": "challanDate",
+              "type": "date",
+              "label": "Challan Date"
+            },
+            {
+              "name": "challanType",
+              "type": "select",
+              "label": "Challan Type",
+              "placeholder": "Select One",
+              "options": {
+                "type": "static",
+                "items": [
+                  { "label": "Treasury Challan", "value": "treasury-challan" },
+                  { "label": "Court Fees", "value": "court-fees" },
+                  { "label": "Stamp Duty", "value": "stamp-duty" }
+                ]
+              }
+            },
+            {
+              "name": "challanAttachment",
+              "type": "file",
+              "label": "Challan Attachment",
+              "accept": ["pdf"],
+              "maxSizeMB": 10
+            }
+          ]
+        },
+        {
+          "id": "documents-block",
+          "title": "Necessary Document Attachments",
+          "layout": "single",
+          "fields": [
+            {
+              "name": "docDraftCopyOfDeed",
+              "type": "file",
+              "label": "Draft Copy of Deed",
+              "accept": ["pdf", "jpg", "png"],
+              "maxSizeMB": 1,
+              "fileVariant": "inline"
+            },
+            {
+              "name": "docNationalIdentityCard",
+              "type": "file",
+              "label": "National Identity Card (NID)",
+              "accept": ["pdf", "jpg", "png"],
+              "maxSizeMB": 1,
+              "fileVariant": "inline"
+            },
+            {
+              "name": "docProofOfSubmissionOfReturn",
+              "type": "file",
+              "label": "Proof of Submission of Return (PSR)",
+              "accept": ["pdf", "jpg", "png"],
+              "maxSizeMB": 1,
+              "fileVariant": "inline"
+            },
+            {
+              "name": "docBirthRegistrationCertificate",
+              "type": "file",
+              "label": "Birth Registration Certificate",
+              "accept": ["pdf", "jpg", "png"],
+              "maxSizeMB": 1,
+              "required": false,
+              "fileVariant": "inline"
+            },
+            {
+              "name": "docCopyOfPassport",
+              "type": "file",
+              "label": "Copy of Passport",
+              "accept": ["pdf", "jpg", "png"],
+              "maxSizeMB": 1,
+              "required": false,
+              "fileVariant": "inline"
+            },
+            {
+              "name": "docSaleDeed",
+              "type": "file",
+              "label": "Sale Deed (Baya Dali)",
+              "accept": ["pdf", "jpg", "png"],
+              "maxSizeMB": 1,
+              "required": false,
+              "fileVariant": "inline"
+            },
+            {
+              "name": "docSurveyKhatian",
+              "type": "file",
+              "label": "Survey Khatian",
+              "accept": ["pdf", "jpg", "png"],
+              "maxSizeMB": 1,
+              "required": false,
+              "fileVariant": "inline"
+            },
+            {
+              "name": "docMutationKhatian",
+              "type": "file",
+              "label": "Mutation Khatian",
+              "accept": ["pdf", "jpg", "png"],
+              "maxSizeMB": 1,
+              "fileVariant": "inline"
+            },
+            {
+              "name": "docDuplicateCarbonReceipt",
+              "type": "file",
+              "label": "Duplicate Carbon Receipt (DCR)",
+              "accept": ["pdf", "jpg", "png"],
+              "maxSizeMB": 1,
+              "required": false,
+              "fileVariant": "inline"
+            },
+            {
+              "name": "docLandTaxReceipt",
+              "type": "file",
+              "label": "Land Tax Receipt",
+              "accept": ["pdf", "jpg", "png"],
+              "maxSizeMB": 1,
+              "fileVariant": "inline"
+            },
+            {
+              "name": "docMap",
+              "type": "file",
+              "label": "Map",
+              "accept": ["pdf", "jpg", "png"],
+              "maxSizeMB": 1,
+              "required": false,
+              "fileVariant": "inline"
+            },
+            {
+              "name": "docOthers",
+              "type": "file",
+              "label": "Others",
+              "accept": ["pdf", "jpg", "png"],
+              "maxSizeMB": 1,
+              "required": false,
+              "fileVariant": "inline"
+            }
+          ]
+        },
+        {
+          "id": "declaration-block",
+          "title": "Declaration",
+          "layout": "single",
+          "fields": [
+            {
+              "name": "declaration",
+              "type": "checkbox",
+              "label": "I do hereby declared that the information I have given above is true to the best of my knowledge and I will be responsible for any false information statement given.",
+              "validation": {
+                "messages": {
+                  "required": "You must accept the declaration"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -36,8 +36,22 @@ export type StaticOptions = {
 
 export type DynamicOptions = {
   type: "api";
-  fetcher: (params?: Record<string, string>) => Promise<SelectOption[]>;
-  /** dot-path of a field whose value is forwarded to fetcher as a param */
+  /**
+   * URL-based approach — no functions needed in the config.
+   * The response must be an array of `{ label, value }` objects.
+   */
+  url?: string;
+  /**
+   * Query-parameter name to use when sending the `dependsOn` value to the API.
+   * e.g. `paramName: "divisionId"` → `/api/locations/districts?divisionId=dhaka`
+   */
+  paramName?: string;
+  /**
+   * Function-based approach (advanced / backward-compatible).
+   * If both `url` and `fetcher` are provided, `fetcher` takes precedence.
+   */
+  fetcher?: (params?: Record<string, string>) => Promise<SelectOption[]>;
+  /** dot-path of a field whose value is forwarded to the API as a query param */
   dependsOn?: string;
 };
 

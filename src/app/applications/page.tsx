@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { formSubmissions } from "@/lib/db/schema";
+import { getSlugForService } from "@/lib/form-registry";
 import { format } from "date-fns";
 import { desc } from "drizzle-orm";
 import Link from "next/link";
@@ -98,15 +99,18 @@ export default async function ApplicationsPage() {
                 <div className="flex justify-end">
                   {s.status === "DRAFT" ? (
                     <Link
-                      href={`/security-clearance?edit=${s.id}`}
+                      href={`/forms/${getSlugForService(s.serviceName) ?? s.serviceName}?edit=${s.id}`}
                       className="rounded-[8px] border border-[#150004] bg-white px-4 py-2 text-xs font-semibold text-[#150004] hover:bg-gray-50"
                     >
                       Edit
                     </Link>
                   ) : (
-                    <span className="px-4 py-2 text-xs text-muted-foreground">
-                      —
-                    </span>
+                    <Link
+                      href={`/applications/${s.id}`}
+                      className="rounded-[8px] border border-[#a50022] bg-white px-4 py-2 text-xs font-semibold text-[#a50022] hover:bg-red-50"
+                    >
+                      View
+                    </Link>
                   )}
                 </div>
               </div>

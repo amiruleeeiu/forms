@@ -9,7 +9,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
-import { UploadCloudIcon, XIcon } from "lucide-react";
+import { FileText, UploadCloudIcon, XIcon } from "lucide-react";
 import { useRef } from "react";
 import {
   type FieldValues,
@@ -17,6 +17,26 @@ import {
   useFormContext,
 } from "react-hook-form";
 import type { BaseFieldProps } from "./types";
+
+// ---------------------------------------------------------------------------
+// Uploaded file reference — stored in DB as { url, originalName }
+// ---------------------------------------------------------------------------
+
+type UploadedFileRef = { url: string; originalName: string };
+
+function isUploadedRef(v: unknown): v is UploadedFileRef {
+  return (
+    typeof v === "object" &&
+    v !== null &&
+    !Array.isArray(v) &&
+    typeof (v as Record<string, unknown>).url === "string" &&
+    typeof (v as Record<string, unknown>).originalName === "string"
+  );
+}
+
+type FileItem =
+  | { kind: "file"; file: File; arrayIndex: number }
+  | { kind: "ref"; url: string; name: string; arrayIndex: number };
 
 interface FileUploadFieldProps<
   TFieldValues extends FieldValues,
@@ -63,8 +83,8 @@ function FileUploadField<TFieldValues extends FieldValues>({
   function handleFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
     if (multiple) {
-      const existing: File[] = Array.isArray(field.value)
-        ? (field.value as File[])
+      const existing: unknown[] = Array.isArray(field.value)
+        ? (field.value as unknown[])
         : [];
       field.onChange([...existing, ...Array.from(files)]);
     } else {
@@ -88,9 +108,11 @@ function FileUploadField<TFieldValues extends FieldValues>({
     e.preventDefault();
   }
 
-  function removeFile(index?: number) {
+  function removeFile(arrayIndex?: number) {
     if (multiple && Array.isArray(field.value)) {
-      const next = (field.value as File[]).filter((_, i) => i !== index);
+      const next = (field.value as unknown[]).filter(
+        (_, i) => i !== arrayIndex,
+      );
       field.onChange(next.length > 0 ? next : null);
     } else {
       field.onChange(null);
@@ -98,13 +120,38 @@ function FileUploadField<TFieldValues extends FieldValues>({
   }
 
   const rawValue: unknown = field.value;
-  const files: File[] = multiple
-    ? Array.isArray(rawValue)
-      ? (rawValue as File[])
-      : []
-    : rawValue instanceof File
-      ? [rawValue]
-      : [];
+
+  // Build unified display items — handles File (newly selected) and
+  // UploadedFileRef { url, originalName } (loaded from DB in edit mode).
+  const displayItems: FileItem[] = (() => {
+    if (multiple) {
+      const arr = Array.isArray(rawValue) ? (rawValue as unknown[]) : [];
+      return arr.reduce<FileItem[]>((acc, v, idx) => {
+        if (v instanceof File)
+          acc.push({ kind: "file", file: v, arrayIndex: idx });
+        else if (isUploadedRef(v))
+          acc.push({
+            kind: "ref",
+            url: v.url,
+            name: v.originalName,
+            arrayIndex: idx,
+          });
+        return acc;
+      }, []);
+    }
+    if (rawValue instanceof File)
+      return [{ kind: "file", file: rawValue, arrayIndex: 0 }];
+    if (isUploadedRef(rawValue))
+      return [
+        {
+          kind: "ref",
+          url: rawValue.url,
+          name: rawValue.originalName,
+          arrayIndex: 0,
+        },
+      ];
+    return [];
+  })();
 
   function formatSize(bytes: number) {
     if (bytes < 1024) return `${bytes} B`;
@@ -138,19 +185,38 @@ function FileUploadField<TFieldValues extends FieldValues>({
                   disabled && "pointer-events-none",
                 )}
               >
-                Choose File
+                {displayItems.length > 0 ? "Replace" : "Choose File"}
               </button>
-              <span className="truncate text-sm text-muted-foreground">
-                {files.length === 0
-                  ? "No file chosen"
-                  : files.length === 1
-                    ? files[0].name
-                    : `${files.length} files`}
-              </span>
-              {files.length > 0 && (
+              {displayItems.length === 0 ? (
+                <span className="truncate text-sm text-muted-foreground">
+                  No file chosen
+                </span>
+              ) : displayItems[0].kind === "ref" ? (
+                <a
+                  href={displayItems[0].url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex min-w-0 items-center gap-1.5 truncate text-sm font-medium text-primary hover:underline"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <FileText className="h-3.5 w-3.5 shrink-0" />
+                  <span className="truncate">{displayItems[0].name}</span>
+                </a>
+              ) : (
+                <span className="truncate text-sm text-muted-foreground">
+                  {displayItems.length === 1
+                    ? displayItems[0].file.name
+                    : `${displayItems.length} files`}
+                </span>
+              )}
+              {displayItems.length > 0 && (
                 <button
                   type="button"
-                  onClick={() => removeFile()}
+                  onClick={() =>
+                    removeFile(
+                      multiple ? displayItems[0].arrayIndex : undefined,
+                    )
+                  }
                   disabled={disabled}
                   aria-label="Remove file"
                   className="ml-auto shrink-0 rounded-sm p-0.5 text-muted-foreground hover:text-destructive focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-destructive"
@@ -221,24 +287,47 @@ function FileUploadField<TFieldValues extends FieldValues>({
             </div>
           )}
         </FormControl>
-        {variant === "dropzone" && files.length > 0 && (
+        {variant === "dropzone" && displayItems.length > 0 && (
           <ul className="mt-2 space-y-1">
-            {files.map((file, i) => (
+            {displayItems.map((item) => (
               <li
-                key={`${file.name}-${i}`}
+                key={
+                  item.kind === "file"
+                    ? `${item.file.name}-${item.arrayIndex}`
+                    : item.url
+                }
                 className="flex items-center justify-between rounded-md border bg-muted/50 px-3 py-1.5 text-sm"
               >
-                <span className="truncate text-foreground">{file.name}</span>
+                {item.kind === "ref" ? (
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex min-w-0 items-center gap-1.5 truncate font-medium text-primary hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <FileText className="h-3.5 w-3.5 shrink-0" />
+                    <span className="truncate">{item.name}</span>
+                  </a>
+                ) : (
+                  <span className="truncate text-foreground">
+                    {item.file.name}
+                  </span>
+                )}
                 <div className="ml-3 flex shrink-0 items-center gap-2 text-muted-foreground">
-                  <span className="text-xs">{formatSize(file.size)}</span>
+                  {item.kind === "file" && (
+                    <span className="text-xs">
+                      {formatSize(item.file.size)}
+                    </span>
+                  )}
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      removeFile(multiple ? i : undefined);
+                      removeFile(multiple ? item.arrayIndex : undefined);
                     }}
                     disabled={disabled}
-                    aria-label={`Remove ${file.name}`}
+                    aria-label={`Remove ${item.kind === "file" ? item.file.name : item.name}`}
                     className="rounded-sm p-0.5 hover:text-destructive focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-destructive"
                   >
                     <XIcon className="h-3.5 w-3.5" />

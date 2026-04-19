@@ -62,8 +62,31 @@ export function useDynamicOptions(
         ? { [config.dependsOn]: String(watchedValue) }
         : undefined;
 
-    config
-      .fetcher(params)
+    // Resolve the actual fetch call: function-based takes precedence, then URL-based.
+    const resolve: Promise<SelectOption[]> = config.fetcher
+      ? config.fetcher(params)
+      : config.url
+        ? (async () => {
+            const depValue =
+              config.dependsOn && params ? params[config.dependsOn] : undefined;
+            // If a dependsOn is configured but the value is not yet available,
+            // return an empty list (same behaviour as the old inline fetchers).
+            if (config.dependsOn && !depValue) return [];
+
+            let url = config.url!;
+            if (config.paramName && depValue) {
+              const qs = new URLSearchParams({
+                [config.paramName]: depValue,
+              }).toString();
+              url = `${url}?${qs}`;
+            }
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+            return res.json() as Promise<SelectOption[]>;
+          })()
+        : Promise.resolve([]);
+
+    resolve
       .then((items) => {
         if (!cancelled) dispatch({ type: "success", items });
       })

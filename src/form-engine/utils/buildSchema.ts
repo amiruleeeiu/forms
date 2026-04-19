@@ -36,7 +36,9 @@ function buildFieldSchema(field: FieldConfig): z.ZodTypeAny {
 
   // ---- date ----
   if (field.type === "date") {
-    const s = z.date({ error: msgs.required ?? `${field.label} is required` });
+    const s = z.coerce.date({
+      error: msgs.required ?? `${field.label} is required`,
+    });
     return isRequired ? s : s.optional();
   }
 
@@ -52,10 +54,24 @@ function buildFieldSchema(field: FieldConfig): z.ZodTypeAny {
 
   // ---- file ----
   if (field.type === "file") {
+    const isValidFileValue = (val: unknown): boolean => {
+      if (val instanceof File) return true;
+      // Uploaded-file reference saved from a previous submission: { url, originalName }
+      if (
+        typeof val === "object" &&
+        val !== null &&
+        !Array.isArray(val) &&
+        typeof (val as Record<string, unknown>).url === "string" &&
+        typeof (val as Record<string, unknown>).originalName === "string"
+      )
+        return true;
+      return false;
+    };
+
     const fileSchema = z.custom<File | null>(
       (val) => {
         if (!isRequired) return true;
-        return val instanceof File;
+        return isValidFileValue(val);
       },
       {
         message:

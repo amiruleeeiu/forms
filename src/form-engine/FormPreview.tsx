@@ -22,6 +22,22 @@ import type { BlockConfig, FieldConfig, StepFormConfig } from "./types";
 import { evaluateCondition } from "./utils/evaluateCondition";
 
 // ---------------------------------------------------------------------------
+// Uploaded file reference helper (mirrors FileUploadField)
+// ---------------------------------------------------------------------------
+
+type UploadedFileRef = { url: string; originalName: string };
+
+function isUploadedRef(v: unknown): v is UploadedFileRef {
+  return (
+    typeof v === "object" &&
+    v !== null &&
+    !Array.isArray(v) &&
+    typeof (v as Record<string, unknown>).url === "string" &&
+    typeof (v as Record<string, unknown>).originalName === "string"
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Value formatting
 // ---------------------------------------------------------------------------
 
@@ -55,9 +71,16 @@ function formatFieldValue(field: FieldConfig, value: unknown): string {
       return resolveOptionLabel(field, value);
     case "file":
       if (value instanceof File) return value.name;
+      if (isUploadedRef(value)) return value.originalName;
       if (Array.isArray(value))
         return value
-          .map((f: unknown) => (f instanceof File ? f.name : String(f)))
+          .map((f: unknown) =>
+            f instanceof File
+              ? f.name
+              : isUploadedRef(f)
+                ? f.originalName
+                : String(f),
+          )
           .join(", ");
       return String(value);
     case "password":
@@ -127,7 +150,10 @@ function FileLink({ rawValue }: { rawValue: unknown }) {
     if (Array.isArray(rawValue)) {
       const first = rawValue.find((f): f is File => f instanceof File);
       if (first) return URL.createObjectURL(first);
+      const firstRef = rawValue.find(isUploadedRef);
+      if (firstRef) return firstRef.url;
     }
+    if (isUploadedRef(rawValue)) return rawValue.url;
     if (typeof rawValue === "string" && rawValue) return rawValue;
     return null;
   });
@@ -184,6 +210,10 @@ function InlineFileValue({ rawValue }: { rawValue: unknown }) {
         name: file.name,
       };
     }
+    if (isUploadedRef(rawValue)) {
+      const isImage = /\.(jpe?g|png|gif|webp|svg|bmp)$/i.test(rawValue.url);
+      return { href: rawValue.url, isImage, name: rawValue.originalName };
+    }
     if (typeof rawValue === "string" && rawValue) {
       const isImage = /\.(jpe?g|png|gif|webp|svg|bmp)$/i.test(rawValue);
       return {
@@ -228,7 +258,36 @@ function InlineFileValue({ rawValue }: { rawValue: unknown }) {
     );
   }
 
-  return <span className="wrap-break-word">{info.name}</span>;
+  return (
+    <a
+      href={info.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-1.5 text-sm font-medium text-[#007bff] hover:underline break-all"
+    >
+      <FileText className="size-4 shrink-0" aria-hidden="true" />
+      {info.name}
+    </a>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// blockIsAllFiles — true when every field in a normal block is type=file
+// ---------------------------------------------------------------------------
+
+function blockIsAllFiles(
+  block: StepFormConfig["steps"][number]["blocks"][number],
+  values: Record<string, unknown>,
+): boolean {
+  if (block.repeatable) return false;
+  let total = 0;
+  let fileCount = 0;
+  for (const field of block.fields) {
+    if (!isFieldVisible(field, values)) continue;
+    total++;
+    if (field.type === "file") fileCount++;
+  }
+  return total > 0 && total === fileCount;
 }
 
 // ---------------------------------------------------------------------------
@@ -404,6 +463,11 @@ export interface FormPreviewProps {
   isLoading?: boolean;
   /** Called when user clicks Edit on a section — passes step index */
   onEdit?: (stepIndex: number) => void;
+  /**
+   * When true, renders in read-only mode: no Edit buttons, no action footer.
+   * Useful for viewing submitted applications.
+   */
+  readOnly?: boolean;
 }
 
 export function FormPreview({
@@ -414,6 +478,7 @@ export function FormPreview({
   onConfirm,
   isLoading,
   onEdit,
+  readOnly,
 }: FormPreviewProps) {
   return (
     <div>
@@ -492,7 +557,7 @@ export function FormPreview({
                   <StepAccordionHeader
                     title={step.title}
                     stepIndex={stepIndex}
-                    onEdit={onEdit}
+                    onEdit={readOnly ? undefined : onEdit}
                   />
                   <AccordionContent className="pb-0">
                     <div className="rounded-xl bg-[#fafafa] px-6 pt-6 pb-10">
@@ -561,6 +626,47 @@ export function FormPreview({
               }
 
               // ── Normal block ─────────────────────────────────────────────
+              // If every field in the block is a file → render as table
+              if (blockIsAllFiles(block, values)) {
+                const fileRows: {
+                  key: string;
+                  label: string;
+                  rawValue: unknown;
+                }[] = [];
+                for (const field of block.fields) {
+                  if (!isFieldVisible(field, values)) continue;
+                  const rawValue = values[field.name];
+                  if (
+                    rawValue === null ||
+                    rawValue === undefined ||
+                    rawValue === ""
+                  )
+                    continue;
+                  fileRows.push({
+                    key: field.name,
+                    label: field.label,
+                    rawValue,
+                  });
+                }
+                if (fileRows.length > 0) {
+                  blockSections.push(
+                    <div
+                      key={block.id}
+                      className={cn(blockSections.length > 0 && "mt-6")}
+                    >
+                      {block.title && (
+                        <p className="mb-4 text-base font-bold text-primary">
+                          {block.title}
+                        </p>
+                      )}
+                      <AttachmentTable rows={fileRows} />
+                    </div>,
+                  );
+                }
+                continue;
+              }
+
+              // ── Normal block (mixed fields) ──────────────────────────────
               const gridFields: GridField[] = [];
               for (const field of block.fields) {
                 if (!isFieldVisible(field, values)) continue;
@@ -618,7 +724,7 @@ export function FormPreview({
                 <StepAccordionHeader
                   title={step.title}
                   stepIndex={stepIndex}
-                  onEdit={onEdit}
+                  onEdit={readOnly ? undefined : onEdit}
                 />
                 <AccordionContent className="pb-0">
                   <div className="rounded-xl bg-[#fafafa] px-6 pt-6 pb-10">
@@ -637,28 +743,33 @@ export function FormPreview({
       </div>
 
       {/* Action buttons */}
-      <div className="flex items-center justify-between border-t border-border bg-white px-6 py-6">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onBack}
-          disabled={isLoading}
-          className="h-auto rounded-[8px] border border-[#150004] bg-white px-6 py-3 text-base font-semibold capitalize text-[#150004] hover:bg-white hover:text-[#150004]"
-        >
-          Back
-        </Button>
-        <Button
-          type="button"
-          onClick={onConfirm}
-          disabled={isLoading}
-          className="h-auto rounded-[8px] bg-primary px-6 py-3 text-base font-semibold capitalize text-white shadow-[0px_2px_4px_0px_rgba(165,0,34,0.08),0px_3px_6px_0px_rgba(165,0,34,0.2)] hover:bg-primary/90"
-        >
-          {isLoading && (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
-          )}
-          {action === "submit" ? "Confirm & Pay" : "Save Draft"}
-        </Button>
-      </div>
+      {!readOnly && (
+        <div className="flex items-center justify-between border-t border-border bg-white px-6 py-6">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onBack}
+            disabled={isLoading}
+            className="h-auto rounded-[8px] border border-[#150004] bg-white px-6 py-3 text-base font-semibold capitalize text-[#150004] hover:bg-white hover:text-[#150004]"
+          >
+            Back
+          </Button>
+          <Button
+            type="button"
+            onClick={onConfirm}
+            disabled={isLoading}
+            className="h-auto rounded-[8px] bg-primary px-6 py-3 text-base font-semibold capitalize text-white shadow-[0px_2px_4px_0px_rgba(165,0,34,0.08),0px_3px_6px_0px_rgba(165,0,34,0.2)] hover:bg-primary/90"
+          >
+            {isLoading && (
+              <Loader2
+                className="mr-2 h-4 w-4 animate-spin"
+                aria-hidden="true"
+              />
+            )}
+            {action === "submit" ? "Confirm & Pay" : "Save Draft"}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

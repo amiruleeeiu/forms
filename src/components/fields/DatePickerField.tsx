@@ -94,7 +94,9 @@ function DateTrigger({
       >
         <CalendarIcon className="h-4 w-4 shrink-0" />
         {field.value ? (
-          <span>{format(field.value as Date, dateFormat)}</span>
+          <span>
+            {format(new Date(field.value as string | Date), dateFormat)}
+          </span>
         ) : (
           <span>{placeholder}</span>
         )}
@@ -102,7 +104,9 @@ function DateTrigger({
       <PopoverContent className="w-auto p-0">
         <Calendar
           mode="single"
-          selected={field.value as Date | undefined}
+          selected={
+            field.value ? new Date(field.value as string | Date) : undefined
+          }
           onSelect={(date) => {
             field.onChange(date);
             setOpen(false);

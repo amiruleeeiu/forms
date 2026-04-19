@@ -11,52 +11,6 @@ const LOCAL_ADDRESS_RESET_ON: string[] = [
   "companyAccommodationLocation",
 ];
 
-async function fetchDivisions() {
-  const res = await fetch("/api/locations/divisions");
-  return res.json();
-}
-
-async function fetchDistricts(params?: Record<string, string>) {
-  const divisionId = params?.["localDivision"];
-  if (!divisionId) return [];
-  const res = await fetch(
-    `/api/locations/districts?divisionId=${encodeURIComponent(divisionId)}`,
-  );
-  return res.json();
-}
-
-async function fetchDistrictsByDivision(params?: Record<string, string>) {
-  const divisionId = params?.["factoryDivision"];
-  if (!divisionId) return [];
-  const res = await fetch(
-    `/api/locations/districts?divisionId=${encodeURIComponent(divisionId)}`,
-  );
-  return res.json();
-}
-
-async function fetchThanas(params?: Record<string, string>) {
-  const districtId = params?.["localDistrict"];
-  if (!districtId) return [];
-  const res = await fetch(
-    `/api/locations/thanas?districtId=${encodeURIComponent(districtId)}`,
-  );
-  return res.json();
-}
-
-async function fetchThanasByDistrict(params?: Record<string, string>) {
-  const districtId = params?.["factoryDistrict"];
-  if (!districtId) return [];
-  const res = await fetch(
-    `/api/locations/thanas?districtId=${encodeURIComponent(districtId)}`,
-  );
-  return res.json();
-}
-
-async function fetchCountries() {
-  const res = await fetch("/api/locations/countries");
-  return res.json();
-}
-
 /** Standard local address fields — shared across all non-factory scenarios. */
 const STANDARD_LOCAL_ADDRESS_FIELDS: FieldConfig[] = [
   {
@@ -64,7 +18,7 @@ const STANDARD_LOCAL_ADDRESS_FIELDS: FieldConfig[] = [
     type: "select",
     label: "Division",
     placeholder: "Select One",
-    options: { type: "api", fetcher: fetchDivisions },
+    options: { type: "api", url: "/api/locations/divisions" },
   },
   {
     name: "localDistrict",
@@ -73,7 +27,8 @@ const STANDARD_LOCAL_ADDRESS_FIELDS: FieldConfig[] = [
     placeholder: "Select District",
     options: {
       type: "api",
-      fetcher: fetchDistricts,
+      url: "/api/locations/districts",
+      paramName: "divisionId",
       dependsOn: "localDivision",
     },
   },
@@ -82,7 +37,12 @@ const STANDARD_LOCAL_ADDRESS_FIELDS: FieldConfig[] = [
     type: "select",
     label: "Police Station",
     placeholder: "Select Police Station",
-    options: { type: "api", fetcher: fetchThanas, dependsOn: "localDistrict" },
+    options: {
+      type: "api",
+      url: "/api/locations/thanas",
+      paramName: "districtId",
+      dependsOn: "localDistrict",
+    },
   },
   {
     name: "localPostOffice",
@@ -270,7 +230,7 @@ export const securityClearanceFormConfig: StepFormConfig = {
               type: "searchable-select",
               label: "Country",
               placeholder: "Select Country",
-              options: { type: "api", fetcher: fetchCountries },
+              options: { type: "api", url: "/api/locations/countries" },
             },
             {
               name: "foreignState",
@@ -519,7 +479,7 @@ export const securityClearanceFormConfig: StepFormConfig = {
               type: "select",
               label: "Division",
               placeholder: "Select One",
-              options: { type: "api", fetcher: fetchDivisions },
+              options: { type: "api", url: "/api/locations/divisions" },
             },
             {
               name: "factoryDistrict",
@@ -528,7 +488,8 @@ export const securityClearanceFormConfig: StepFormConfig = {
               placeholder: "Select District",
               options: {
                 type: "api",
-                fetcher: fetchDistrictsByDivision,
+                url: "/api/locations/districts",
+                paramName: "divisionId",
                 dependsOn: "factoryDivision",
               },
             },
@@ -539,7 +500,8 @@ export const securityClearanceFormConfig: StepFormConfig = {
               placeholder: "Select Police Station",
               options: {
                 type: "api",
-                fetcher: fetchThanasByDistrict,
+                url: "/api/locations/thanas",
+                paramName: "districtId",
                 dependsOn: "factoryDistrict",
               },
             },
