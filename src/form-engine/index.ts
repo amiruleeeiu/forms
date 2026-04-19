@@ -32,4 +32,7 @@ export type {
 export { buildDefaultValues, buildSchemaFromConfig } from "./utils/buildSchema";
 export { evaluateCondition, getValueByPath } from "./utils/evaluateCondition";
 export { getStepFieldNames } from "./utils/getStepFieldNames";
-export { groupValuesByConfig } from "./utils/groupValuesByConfig";
+export {
+  flattenGroupedValues,
+  groupValuesByConfig,
+} from "./utils/groupValuesByConfig";

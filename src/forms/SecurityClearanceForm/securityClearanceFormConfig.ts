@@ -11,30 +11,51 @@ const LOCAL_ADDRESS_RESET_ON: string[] = [
   "companyAccommodationLocation",
 ];
 
-const DIVISION_OPTIONS = [
-  { label: "Dhaka", value: "dhaka" },
-  { label: "Chittagong", value: "chittagong" },
-  { label: "Rajshahi", value: "rajshahi" },
-  { label: "Khulna", value: "khulna" },
-  { label: "Barishal", value: "barishal" },
-  { label: "Sylhet", value: "sylhet" },
-  { label: "Rangpur", value: "rangpur" },
-  { label: "Mymensingh", value: "mymensingh" },
-];
+async function fetchDivisions() {
+  const res = await fetch("/api/locations/divisions");
+  return res.json();
+}
 
-const DISTRICT_OPTIONS = [
-  { label: "Dhaka", value: "dhaka" },
-  { label: "Gazipur", value: "gazipur" },
-  { label: "Narayanganj", value: "narayanganj" },
-  { label: "Chattogram", value: "chattogram" },
-];
+async function fetchDistricts(params?: Record<string, string>) {
+  const divisionId = params?.["localDivision"];
+  if (!divisionId) return [];
+  const res = await fetch(
+    `/api/locations/districts?divisionId=${encodeURIComponent(divisionId)}`,
+  );
+  return res.json();
+}
 
-const POLICE_STATION_OPTIONS = [
-  { label: "Kapasia", value: "kapasia" },
-  { label: "Mirpur", value: "mirpur" },
-  { label: "Dhanmondi", value: "dhanmondi" },
-  { label: "Gulshan", value: "gulshan" },
-];
+async function fetchDistrictsByDivision(params?: Record<string, string>) {
+  const divisionId = params?.["factoryDivision"];
+  if (!divisionId) return [];
+  const res = await fetch(
+    `/api/locations/districts?divisionId=${encodeURIComponent(divisionId)}`,
+  );
+  return res.json();
+}
+
+async function fetchThanas(params?: Record<string, string>) {
+  const districtId = params?.["localDistrict"];
+  if (!districtId) return [];
+  const res = await fetch(
+    `/api/locations/thanas?districtId=${encodeURIComponent(districtId)}`,
+  );
+  return res.json();
+}
+
+async function fetchThanasByDistrict(params?: Record<string, string>) {
+  const districtId = params?.["factoryDistrict"];
+  if (!districtId) return [];
+  const res = await fetch(
+    `/api/locations/thanas?districtId=${encodeURIComponent(districtId)}`,
+  );
+  return res.json();
+}
+
+async function fetchCountries() {
+  const res = await fetch("/api/locations/countries");
+  return res.json();
+}
 
 /** Standard local address fields — shared across all non-factory scenarios. */
 const STANDARD_LOCAL_ADDRESS_FIELDS: FieldConfig[] = [
@@ -43,21 +64,25 @@ const STANDARD_LOCAL_ADDRESS_FIELDS: FieldConfig[] = [
     type: "select",
     label: "Division",
     placeholder: "Select One",
-    options: { type: "static", items: DIVISION_OPTIONS },
+    options: { type: "api", fetcher: fetchDivisions },
   },
   {
     name: "localDistrict",
     type: "select",
     label: "District",
     placeholder: "Select District",
-    options: { type: "static", items: DISTRICT_OPTIONS },
+    options: {
+      type: "api",
+      fetcher: fetchDistricts,
+      dependsOn: "localDivision",
+    },
   },
   {
     name: "localPoliceStation",
     type: "select",
     label: "Police Station",
     placeholder: "Select Police Station",
-    options: { type: "static", items: POLICE_STATION_OPTIONS },
+    options: { type: "api", fetcher: fetchThanas, dependsOn: "localDistrict" },
   },
   {
     name: "localPostOffice",
@@ -245,61 +270,7 @@ export const securityClearanceFormConfig: StepFormConfig = {
               type: "searchable-select",
               label: "Country",
               placeholder: "Select Country",
-              options: {
-                type: "static",
-                items: [
-                  { label: "Afghanistan", value: "afghanistan" },
-                  { label: "Algeria", value: "algeria" },
-                  { label: "Australia", value: "australia" },
-                  { label: "Bahrain", value: "bahrain" },
-                  { label: "Bangladesh", value: "bangladesh" },
-                  { label: "Belgium", value: "belgium" },
-                  { label: "Brazil", value: "brazil" },
-                  { label: "Canada", value: "canada" },
-                  { label: "China", value: "china" },
-                  { label: "Denmark", value: "denmark" },
-                  { label: "Egypt", value: "egypt" },
-                  { label: "France", value: "france" },
-                  { label: "Germany", value: "germany" },
-                  { label: "India", value: "india" },
-                  { label: "Indonesia", value: "indonesia" },
-                  { label: "Iran", value: "iran" },
-                  { label: "Iraq", value: "iraq" },
-                  { label: "Italy", value: "italy" },
-                  { label: "Japan", value: "japan" },
-                  { label: "Jordan", value: "jordan" },
-                  { label: "Kuwait", value: "kuwait" },
-                  { label: "Lebanon", value: "lebanon" },
-                  { label: "Libya", value: "libya" },
-                  { label: "Malaysia", value: "malaysia" },
-                  { label: "Maldives", value: "maldives" },
-                  { label: "Morocco", value: "morocco" },
-                  { label: "Myanmar", value: "myanmar" },
-                  { label: "Nepal", value: "nepal" },
-                  { label: "Netherlands", value: "netherlands" },
-                  { label: "Nigeria", value: "nigeria" },
-                  { label: "Norway", value: "norway" },
-                  { label: "Oman", value: "oman" },
-                  { label: "Pakistan", value: "pakistan" },
-                  { label: "Philippines", value: "philippines" },
-                  { label: "Qatar", value: "qatar" },
-                  { label: "Russia", value: "russia" },
-                  { label: "Saudi Arabia", value: "saudi-arabia" },
-                  { label: "Singapore", value: "singapore" },
-                  { label: "South Korea", value: "south-korea" },
-                  { label: "Spain", value: "spain" },
-                  { label: "Sri Lanka", value: "sri-lanka" },
-                  { label: "Sweden", value: "sweden" },
-                  { label: "Switzerland", value: "switzerland" },
-                  { label: "Thailand", value: "thailand" },
-                  { label: "Turkey", value: "turkey" },
-                  { label: "United Arab Emirates", value: "uae" },
-                  { label: "United Kingdom", value: "uk" },
-                  { label: "United States", value: "usa" },
-                  { label: "Vietnam", value: "vietnam" },
-                  { label: "Yemen", value: "yemen" },
-                ],
-              },
+              options: { type: "api", fetcher: fetchCountries },
             },
             {
               name: "foreignState",
@@ -548,21 +519,29 @@ export const securityClearanceFormConfig: StepFormConfig = {
               type: "select",
               label: "Division",
               placeholder: "Select One",
-              options: { type: "static", items: DIVISION_OPTIONS },
+              options: { type: "api", fetcher: fetchDivisions },
             },
             {
               name: "factoryDistrict",
               type: "select",
               label: "District",
               placeholder: "Select District",
-              options: { type: "static", items: DISTRICT_OPTIONS },
+              options: {
+                type: "api",
+                fetcher: fetchDistrictsByDivision,
+                dependsOn: "factoryDivision",
+              },
             },
             {
               name: "factoryPoliceStation",
               type: "select",
               label: "Police Station",
               placeholder: "Select Police Station",
-              options: { type: "static", items: POLICE_STATION_OPTIONS },
+              options: {
+                type: "api",
+                fetcher: fetchThanasByDistrict,
+                dependsOn: "factoryDistrict",
+              },
             },
             {
               name: "factoryPostOffice",

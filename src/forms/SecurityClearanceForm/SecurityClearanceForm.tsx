@@ -1,6 +1,12 @@
 "use client";
 
-import { FormEngine, groupValuesByConfig } from "@/form-engine";
+import {
+  flattenGroupedValues,
+  FormEngine,
+  groupValuesByConfig,
+} from "@/form-engine";
+import { useRouter } from "next/navigation";
+import { submitForm, updateSubmission, walkAndUploadFiles } from "./api";
 import { securityClearanceFormConfig } from "./securityClearanceFormConfig";
 
 // ---------------------------------------------------------------------------
@@ -49,16 +55,62 @@ const SAMPLE_DATA: Record<string, unknown> = {
   declEmail: "amiruleeeiu15@gmail.com",
 };
 
-export function SecurityClearanceForm() {
-  function handleSubmit(values: Record<string, unknown>) {
+interface SecurityClearanceFormProps {
+  editId?: string;
+  initialValues?: Record<string, unknown>;
+}
+
+export function SecurityClearanceForm({
+  editId,
+  initialValues,
+}: SecurityClearanceFormProps = {}) {
+  const router = useRouter();
+
+  async function handleSubmit(values: Record<string, unknown>) {
     const grouped = groupValuesByConfig(securityClearanceFormConfig, values);
-    console.log("SecurityClearanceForm submitted:", grouped);
+    const uploadedPayload = await walkAndUploadFiles(grouped);
+
+    if (editId) {
+      await updateSubmission(editId, {
+        rawPayload: uploadedPayload,
+        status: "SUBMIT",
+      });
+    } else {
+      await submitForm({
+        serviceName: "security-clearance",
+        stakeholderCode: "SC-001",
+        rawPayload: uploadedPayload,
+        status: "SUBMIT",
+      });
+    }
+
+    router.push("/applications");
   }
 
-  function handleDraft(values: Record<string, unknown>) {
-    const grouped = groupValuesByConfig(securityClearanceFormConfig, values);
-    console.log("SecurityClearanceForm draft saved:", grouped);
+  async function handleDraft(values: Record<string, unknown>) {
+    // Store flat (pre-grouped) values so the form can be re-loaded for editing
+    const uploadedValues = await walkAndUploadFiles(values);
+
+    if (editId) {
+      await updateSubmission(editId, {
+        rawPayload: uploadedValues,
+        status: "DRAFT",
+      });
+    } else {
+      await submitForm({
+        serviceName: "security-clearance",
+        stakeholderCode: "SC-001",
+        rawPayload: uploadedValues,
+        status: "DRAFT",
+      });
+    }
+
+    router.push("/applications");
   }
+
+  const flatInitialValues = initialValues
+    ? flattenGroupedValues(initialValues)
+    : undefined;
 
   return (
     <FormEngine
@@ -66,6 +118,7 @@ export function SecurityClearanceForm() {
       onSubmit={handleSubmit}
       onDraft={handleDraft}
       sampleData={SAMPLE_DATA}
+      defaultValues={flatInitialValues}
     />
   );
 }

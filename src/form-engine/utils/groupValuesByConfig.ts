@@ -1,6 +1,40 @@
 import type { StepFormConfig } from "../types";
 
 /**
+ * Inverse of groupValuesByConfig — takes a possibly nested payload
+ * (as stored in the DB after grouping) and flattens it back to the flat
+ * field-name map that react-hook-form expects as `defaultValues`.
+ *
+ * Rules:
+ * - Arrays are kept as-is (repeatable blocks like `passports`)
+ * - Objects that have a `url` key are kept as-is (uploaded file references)
+ * - All other plain objects are recursed and their children merged flat
+ */
+export function flattenGroupedValues(
+  data: Record<string, unknown>,
+): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
+
+  function walk(node: Record<string, unknown>) {
+    for (const [key, value] of Object.entries(node)) {
+      const isPlainObject =
+        value !== null && typeof value === "object" && !Array.isArray(value);
+
+      if (isPlainObject && !("url" in (value as object))) {
+        // Nested group — recurse into it
+        walk(value as Record<string, unknown>);
+      } else {
+        // Leaf: primitive, null, array, or uploaded-file reference {url, originalName}
+        result[key] = value;
+      }
+    }
+  }
+
+  walk(data);
+  return result;
+}
+
+/**
  * Groups flat form values into a nested object based on the `dataKey` property
  * defined on each step and block in the config.
  *
