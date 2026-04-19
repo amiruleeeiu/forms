@@ -130,9 +130,18 @@ function RepeatableBlockRenderer({ config }: BlockRendererProps) {
         >
           <div className={cn(gridClass || "space-y-4")}>
             {config.fields.map((field) => {
+              const prefix = `${arrayName}.${index}.`;
+              const prefixedOptions =
+                field.options?.type === "api" && field.options.dependsOn
+                  ? {
+                      ...field.options,
+                      dependsOn: `${prefix}${field.options.dependsOn}`,
+                    }
+                  : field.options;
               const prefixedConfig = {
                 ...field,
-                name: `${arrayName}.${index}.${field.name}`,
+                name: `${prefix}${field.name}`,
+                options: prefixedOptions,
               };
               return <FieldRenderer key={field.name} config={prefixedConfig} />;
             })}

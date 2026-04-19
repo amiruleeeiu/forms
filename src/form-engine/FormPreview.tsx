@@ -57,6 +57,20 @@ function resolveOptionLabel(field: FieldConfig, value: unknown): string {
 
 function formatFieldValue(field: FieldConfig, value: unknown): string {
   if (value === null || value === undefined || value === "") return "—";
+  // number-unit: { amount, unit }
+  if (
+    field.type === "number-unit" &&
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value)
+  ) {
+    const v = value as Record<string, unknown>;
+    const amount =
+      v.amount !== "" && v.amount !== undefined ? String(v.amount) : "";
+    const unit = v.unit ? String(v.unit) : "";
+    if (!amount && !unit) return "—";
+    return [amount, unit].filter(Boolean).join(" ");
+  }
   switch (field.type) {
     case "checkbox":
       return value ? "Yes" : "No";

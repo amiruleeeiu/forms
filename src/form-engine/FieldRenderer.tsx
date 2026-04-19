@@ -6,10 +6,12 @@ import {
   DatePickerField,
   FileUploadField,
   NumberInputField,
+  NumberUnitField,
   PhoneInputField,
   RadioGroupField,
   SearchableSelectField,
   SelectField,
+  TextareaField,
   TextInputField,
 } from "@/components/fields";
 import type { SelectOption } from "@/components/fields/types";
@@ -111,6 +113,9 @@ export function FieldRenderer({ config }: FieldRendererProps) {
   };
 
   switch (config.type) {
+    case "textarea":
+      return <TextareaField {...commonProps} />;
+
     case "text":
     case "email":
     case "password":
@@ -166,6 +171,19 @@ export function FieldRenderer({ config }: FieldRendererProps) {
           variant={config.fileVariant}
         />
       );
+
+    case "number-unit": {
+      const unitOpts =
+        config.unitOptions?.type === "static" ? config.unitOptions.items : [];
+      return (
+        <NumberUnitField
+          {...commonProps}
+          unitOptions={unitOpts}
+          unitPlaceholder={config.unitPlaceholder}
+          position={config.numberUnitPosition ?? "right"}
+        />
+      );
+    }
 
     default:
       return null;

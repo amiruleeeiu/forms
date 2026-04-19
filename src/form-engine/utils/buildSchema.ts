@@ -34,6 +34,19 @@ function buildFieldSchema(field: FieldConfig): z.ZodTypeAny {
       : arr;
   }
 
+  // ---- number-unit ----
+  if (field.type === "number-unit") {
+    const schema = z.object({
+      amount: z.coerce.number({
+        error: msgs.required ?? `${field.label} is required`,
+      }),
+      unit: z
+        .string()
+        .min(1, msgs.required ?? `${field.label} unit is required`),
+    });
+    return isRequired ? schema : schema.optional();
+  }
+
   // ---- date ----
   if (field.type === "date") {
     const s = z.coerce.date({

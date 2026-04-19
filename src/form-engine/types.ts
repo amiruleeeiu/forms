@@ -91,11 +91,13 @@ export type FieldValidation = {
 
 export type FieldType =
   | "text"
+  | "textarea"
   | "email"
   | "password"
   | "url"
   | "tel"
   | "number"
+  | "number-unit"
   | "date"
   | "phone"
   | "file"
@@ -139,6 +141,12 @@ export type FieldConfig = {
   // select / radio / checkbox-group
   options?: OptionsConfig;
   emptyText?: string;
+  // number-unit field
+  /** Options for the unit select part of a number-unit field */
+  unitOptions?: OptionsConfig;
+  unitPlaceholder?: string;
+  /** Whether the unit select appears on the left or right of the number input. Default: "right" */
+  numberUnitPosition?: "left" | "right";
   /** Statically hide the field — renders null, value kept in schema */
   hide?: boolean;
   // dynamic conditions

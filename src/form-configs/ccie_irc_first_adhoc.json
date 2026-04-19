@@ -1,0 +1,1079 @@
+{
+  "slug": "ccie_irc_first_adhoc",
+  "title": "Industrial IRC (First Adhoc) Form",
+  "serviceName": "industrial-irc-first-adhoc",
+  "stakeholderCode": "CCIE-IRC-001",
+  "mode": "stepped",
+  "submitLabel": "Preview & Submit",
+  "steps": [
+    {
+      "id": "step-org-info",
+      "dataKey": "orgInfo",
+      "title": "Organization Information",
+      "blocks": [
+        {
+          "id": "org-info-block",
+          "title": "Organization Information",
+          "layout": "2-col",
+          "fields": [
+            {
+              "name": "organizationNo",
+              "type": "text",
+              "label": "Organization No",
+              "placeholder": "Enter organization number"
+            },
+            {
+              "name": "organizationEmail",
+              "type": "email",
+              "label": "Organization Email",
+              "placeholder": "example@domain.com"
+            },
+            {
+              "name": "userGdigitNumber",
+              "type": "text",
+              "label": "User G-digit I/number",
+              "placeholder": "Enter",
+              "required": false
+            },
+            {
+              "name": "companyTitle",
+              "type": "text",
+              "label": "Company Title",
+              "placeholder": "Auto-filled from ERC",
+              "required": false,
+              "disabled": true
+            },
+            {
+              "name": "organizationPhone",
+              "type": "phone",
+              "label": "Organisation Phone",
+              "required": false
+            },
+            {
+              "name": "organizationNameBangla",
+              "type": "text",
+              "label": "Organization Name (Bangla)",
+              "placeholder": "Enter"
+            },
+            {
+              "name": "organizationNameEnglish",
+              "type": "text",
+              "label": "Organization Name (English)",
+              "placeholder": "Enter"
+            },
+            {
+              "name": "organizationAddressBangla",
+              "type": "textarea",
+              "label": "Organization Address (Bangla)",
+              "placeholder": "Address"
+            },
+            {
+              "name": "organizationAddressEnglish",
+              "type": "textarea",
+              "label": "Organization Address (English)",
+              "placeholder": "Address"
+            },
+            {
+              "name": "factoryAddressBangla",
+              "type": "textarea",
+              "label": "Factory Address (Bangla)",
+              "placeholder": "Address"
+            },
+            {
+              "name": "factoryAddressEnglish",
+              "type": "textarea",
+              "label": "Factory Address (English)",
+              "placeholder": "Address"
+            },
+            {
+              "name": "organizationTax",
+              "type": "text",
+              "label": "Organization Tax",
+              "placeholder": "Enter TIN"
+            },
+            {
+              "name": "organizationMobile",
+              "type": "phone",
+              "label": "Organisation Mobile"
+            },
+            {
+              "name": "contactPersonName",
+              "type": "text",
+              "label": "Contact Person Name",
+              "placeholder": "Enter"
+            },
+            {
+              "name": "contactMobilePhone",
+              "type": "phone",
+              "label": "Contact Mobile Phone Number",
+              "required": false
+            },
+            {
+              "name": "divisionName",
+              "type": "select",
+              "label": "Division Name",
+              "placeholder": "Select One",
+              "options": {
+                "type": "api",
+                "url": "/api/locations/divisions"
+              }
+            },
+            {
+              "name": "holdingNo",
+              "type": "text",
+              "label": "Holding No",
+              "placeholder": "Enter",
+              "required": false
+            },
+            {
+              "name": "districtName",
+              "type": "select",
+              "label": "District Name",
+              "placeholder": "Select One",
+              "options": {
+                "type": "api",
+                "url": "/api/locations/districts",
+                "paramName": "divisionId",
+                "dependsOn": "divisionName"
+              }
+            },
+            {
+              "name": "organizationPoliceStation",
+              "type": "searchable-select",
+              "label": "Organisation Police Station",
+              "placeholder": "Select One",
+              "options": {
+                "type": "api",
+                "url": "/api/locations/thanas",
+                "paramName": "districtId",
+                "dependsOn": "districtName"
+              }
+            },
+            {
+              "name": "organizationRootCode",
+              "type": "text",
+              "label": "Organization Root Code",
+              "placeholder": "Enter"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "step-owner-info",
+      "dataKey": "ownerInfo",
+      "title": "Owner Information",
+      "blocks": [
+        {
+          "id": "owners-block",
+          "layout": "2-col",
+          "repeatable": {
+            "arrayName": "owners",
+            "minItems": 1,
+            "addLabel": "+ Add New Person / Owner"
+          },
+          "fields": [
+            {
+              "name": "subService",
+              "type": "select",
+              "label": "Sub Service",
+              "placeholder": "Select One",
+              "options": {
+                "type": "static",
+                "items": [
+                  {
+                    "label": "Industrial IRC (First Adhoc)",
+                    "value": "industrial-irc-first-adhoc"
+                  },
+                  {
+                    "label": "Industrial IRC (Renewal)",
+                    "value": "industrial-irc-renewal"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "ownerPhoto",
+              "type": "file",
+              "label": "Owner Photo",
+              "accept": ["jpg", "jpeg", "png"],
+              "maxSizeMB": 5,
+              "fileVariant": "dropzone",
+              "description": "Drag & drop files here, or click to select. Supports: .jpg, .jpeg, .png. Max size: 5MB."
+            },
+            {
+              "name": "organizationType",
+              "type": "select",
+              "label": "Organization type",
+              "placeholder": "Select One",
+              "options": {
+                "type": "static",
+                "items": [
+                  { "label": "Limited Company", "value": "limited-company" },
+                  { "label": "Proprietorship", "value": "proprietorship" },
+                  { "label": "Partnership", "value": "partnership" },
+                  {
+                    "label": "Society / Trust / NGO",
+                    "value": "society-trust-ngo"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "tinNumber",
+              "type": "text",
+              "label": "TIN Number",
+              "placeholder": "Enter",
+              "description": "12-digit TIN number"
+            },
+            {
+              "name": "nationality",
+              "type": "searchable-select",
+              "label": "Nationality",
+              "placeholder": "Select One",
+              "options": {
+                "type": "api",
+                "url": "/api/locations/countries"
+              }
+            },
+            {
+              "name": "designation",
+              "type": "select",
+              "label": "Designation",
+              "placeholder": "Select One",
+              "options": {
+                "type": "static",
+                "items": [
+                  { "label": "Director", "value": "director" },
+                  { "label": "Chairman", "value": "chairman" },
+                  {
+                    "label": "Managing Director",
+                    "value": "managing-director"
+                  },
+                  { "label": "CEO", "value": "ceo" },
+                  { "label": "Partner", "value": "partner" },
+                  { "label": "Proprietor", "value": "proprietor" },
+                  { "label": "Other", "value": "other" }
+                ]
+              }
+            },
+            {
+              "name": "motherName",
+              "type": "text",
+              "label": "Mother Name",
+              "placeholder": "Enter",
+              "required": false
+            },
+            {
+              "name": "name",
+              "type": "text",
+              "label": "Name",
+              "placeholder": "Enter"
+            },
+            {
+              "name": "fatherName",
+              "type": "text",
+              "label": "Father Name",
+              "placeholder": "Enter",
+              "required": false
+            },
+            {
+              "name": "mobile",
+              "type": "phone",
+              "label": "Mobile"
+            },
+            {
+              "name": "presentAddress",
+              "type": "textarea",
+              "label": "Present Address",
+              "placeholder": "Address"
+            },
+            {
+              "name": "permanentAddress",
+              "type": "textarea",
+              "label": "Permanent Address",
+              "placeholder": "Address"
+            },
+            {
+              "name": "phoneNumberOffice",
+              "type": "phone",
+              "label": "Phone Number (Office)",
+              "required": false
+            },
+            {
+              "name": "incorporationDate",
+              "type": "date",
+              "label": "Incorporation Date",
+              "placeholder": "DD/MM/YYYY",
+              "required": false
+            },
+            {
+              "name": "incorporationNumber",
+              "type": "text",
+              "label": "Incorporation Number",
+              "placeholder": "Enter number",
+              "required": false
+            },
+            {
+              "name": "ownerDivisionName",
+              "type": "select",
+              "label": "Division Name",
+              "placeholder": "Select One",
+              "options": {
+                "type": "api",
+                "url": "/api/locations/divisions"
+              }
+            },
+            {
+              "name": "ownerDistrictName",
+              "type": "select",
+              "label": "District Name",
+              "placeholder": "Select One",
+              "options": {
+                "type": "api",
+                "url": "/api/locations/districts",
+                "paramName": "divisionId",
+                "dependsOn": "ownerDivisionName"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "step-share-info",
+      "dataKey": "shareInfo",
+      "title": "Share Information",
+      "blocks": [
+        {
+          "id": "share-info-block",
+          "title": "Shareholding Information",
+          "layout": "single",
+          "fields": [
+            {
+              "name": "sharePercent",
+              "type": "number-unit",
+              "label": "Share Percent",
+              "placeholder": "Enter percentage",
+              "numberUnitPosition": "left",
+              "unitOptions": {
+                "type": "static",
+                "items": [
+                  { "label": "Domestic", "value": "domestic" },
+                  { "label": "Foreign", "value": "foreign" }
+                ]
+              },
+              "unitPlaceholder": "Select"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "step-other-info",
+      "dataKey": "otherInfo",
+      "title": "Other Information",
+      "blocks": [
+        {
+          "id": "basic-info-block",
+          "title": "Basic Informations",
+          "layout": "2-col",
+          "fields": [
+            {
+              "name": "industrialSectorName",
+              "type": "text",
+              "label": "Industrial Sector Name",
+              "placeholder": "Enter"
+            },
+            {
+              "name": "halfYearlyImportEntitlement",
+              "type": "number-unit",
+              "label": "Half Yearly Import Entitlement",
+              "placeholder": "Enter",
+              "numberUnitPosition": "right",
+              "unitOptions": {
+                "type": "static",
+                "items": [
+                  { "label": "BDT", "value": "BDT" },
+                  { "label": "USD", "value": "USD" }
+                ]
+              },
+              "unitPlaceholder": "Unit"
+            },
+            {
+              "name": "fireLicenseNumber",
+              "type": "text",
+              "label": "Fire License Number",
+              "placeholder": "Enter",
+              "required": false
+            },
+            {
+              "name": "fireLicenseDate",
+              "type": "date",
+              "label": "Fire License Date",
+              "placeholder": "DD/MM/YYYY",
+              "required": false
+            },
+            {
+              "name": "environmentLicenseNumber",
+              "type": "text",
+              "label": "Environment License Number",
+              "placeholder": "Enter",
+              "required": false
+            },
+            {
+              "name": "environmentLicenseDate",
+              "type": "date",
+              "label": "Environment License Date",
+              "placeholder": "DD/MM/YYYY",
+              "required": false
+            },
+            {
+              "name": "incorporationRegNumber",
+              "type": "text",
+              "label": "Incorporation/Registration Number",
+              "placeholder": "Enter",
+              "required": false
+            },
+            {
+              "name": "incorporationRegDate",
+              "type": "date",
+              "label": "Incorporation/Registration Date",
+              "placeholder": "DD/MM/YYYY",
+              "required": false
+            },
+            {
+              "name": "bondLicenseNumber",
+              "type": "text",
+              "label": "Bond License Number",
+              "placeholder": "Enter",
+              "required": false
+            },
+            {
+              "name": "bondLicenseDate",
+              "type": "date",
+              "label": "Bond License Date",
+              "placeholder": "DD/MM/YYYY",
+              "required": false
+            },
+            {
+              "name": "recommendationNumber",
+              "type": "text",
+              "label": "Recommendation Number",
+              "placeholder": "Enter"
+            },
+            {
+              "name": "recommendationDate",
+              "type": "date",
+              "label": "Recommendation Date",
+              "placeholder": "DD/MM/YYYY"
+            },
+            {
+              "name": "industrialSponsorRegNumber",
+              "type": "text",
+              "label": "Industrial Sponsor Registration Number",
+              "placeholder": "Enter"
+            },
+            {
+              "name": "industrialSponsorRegDate",
+              "type": "date",
+              "label": "Industrial Sponsor Registration Date",
+              "placeholder": "DD/MM/YYYY"
+            }
+          ]
+        },
+        {
+          "id": "yearly-capacity-block",
+          "title": "Yearly Capacity Information",
+          "layout": "2-col",
+          "fields": [
+            {
+              "name": "sponsorName",
+              "type": "text",
+              "label": "Sponsor Name",
+              "placeholder": "Enter"
+            },
+            {
+              "name": "yearlyProductionCapacity",
+              "type": "number-unit",
+              "label": "Yearly Production Capacity",
+              "placeholder": "Enter",
+              "numberUnitPosition": "right",
+              "unitOptions": {
+                "type": "static",
+                "items": [
+                  { "label": "Kilogram (KG)", "value": "KG" },
+                  { "label": "Metric Tonne (MT)", "value": "MT" },
+                  { "label": "Litre", "value": "Litre" },
+                  { "label": "Piece", "value": "Piece" }
+                ]
+              },
+              "unitPlaceholder": "Unit"
+            },
+            {
+              "name": "productionCapacity",
+              "type": "number",
+              "label": "Production Capacity",
+              "placeholder": "Enter",
+              "required": false
+            },
+            {
+              "name": "totalNumberOfLabour",
+              "type": "number",
+              "label": "Total Number of Labour",
+              "placeholder": "Enter",
+              "required": false
+            },
+            {
+              "name": "productionStartDate",
+              "type": "date",
+              "label": "Production Start Date",
+              "placeholder": "DD/MM/YYYY",
+              "required": false
+            },
+            {
+              "name": "importedSpareParts",
+              "type": "text",
+              "label": "Imported Spare Parts",
+              "placeholder": "Enter",
+              "required": false
+            },
+            {
+              "name": "inspectionDate",
+              "type": "date",
+              "label": "Inspection Date",
+              "placeholder": "DD/MM/YYYY",
+              "required": false
+            },
+            {
+              "name": "inspectorName",
+              "type": "text",
+              "label": "Inspector Name",
+              "placeholder": "Enter",
+              "required": false
+            }
+          ]
+        },
+        {
+          "id": "half-yearly-raw-material-block",
+          "title": "Half Yearly Raw Material Adhoc Information",
+          "layout": "2-col",
+          "fields": [
+            {
+              "name": "rawMaterialProductionPercentage",
+              "type": "number",
+              "label": "Raw material Production Percentage",
+              "placeholder": "Enter",
+              "min": 0,
+              "max": 100
+            },
+            {
+              "name": "halfYearlyProductionCapacity",
+              "type": "number-unit",
+              "label": "Half Yearly Production Capacity",
+              "placeholder": "Enter",
+              "required": false,
+              "numberUnitPosition": "right",
+              "unitOptions": {
+                "type": "static",
+                "items": [
+                  { "label": "Kilogram (KG)", "value": "KG" },
+                  { "label": "Metric Tonne (MT)", "value": "MT" },
+                  { "label": "Litre", "value": "Litre" },
+                  { "label": "Piece", "value": "Piece" }
+                ]
+              },
+              "unitPlaceholder": "Unit"
+            },
+            {
+              "name": "halfYearlyProductionDemand",
+              "type": "number",
+              "label": "Half Yearly Production Demand",
+              "placeholder": "Enter",
+              "required": false
+            }
+          ]
+        },
+        {
+          "id": "adhoc-items-block",
+          "title": "Adhoc Items",
+          "description": "Machineries/Materials এর ইনফরমেশন add করতে চাইলে 'Add Adhoc Item' button এ ক্লিক করুন। Adhoc Item এর তথ্য পুনরায় 'Add Adhoc Item' button এ ক্লিক করুন।",
+          "layout": "2-col",
+          "repeatable": {
+            "arrayName": "adhocItems",
+            "minItems": 0,
+            "addLabel": "+ Add Adhoc Item"
+          },
+          "fields": [
+            {
+              "name": "itemType",
+              "type": "select",
+              "label": "Item Type",
+              "placeholder": "Select One",
+              "options": {
+                "type": "static",
+                "items": [
+                  { "label": "Machineries", "value": "machineries" },
+                  { "label": "Materials", "value": "materials" }
+                ]
+              }
+            },
+            {
+              "name": "descriptionOfItem",
+              "type": "text",
+              "label": "Description of Item",
+              "placeholder": "Enter"
+            },
+            {
+              "name": "issueDate",
+              "type": "date",
+              "label": "Issue Date",
+              "placeholder": "DD/MM/YYYY"
+            },
+            {
+              "name": "hsCode",
+              "type": "text",
+              "label": "HS Code",
+              "placeholder": "Enter"
+            },
+            {
+              "name": "value",
+              "type": "number",
+              "label": "Value",
+              "placeholder": "Enter",
+              "min": 0
+            },
+            {
+              "name": "unitPrice",
+              "type": "number",
+              "label": "Unit Price",
+              "placeholder": "Enter",
+              "min": 0
+            },
+            {
+              "name": "quantity",
+              "type": "number-unit",
+              "label": "Quantity",
+              "placeholder": "Enter",
+              "numberUnitPosition": "right",
+              "unitOptions": {
+                "type": "static",
+                "items": [
+                  { "label": "Kilogram (KG)", "value": "KG" },
+                  { "label": "Metric Tonne (MT)", "value": "MT" },
+                  { "label": "Litre", "value": "Litre" },
+                  { "label": "Piece", "value": "Piece" }
+                ]
+              },
+              "unitPlaceholder": "Unit"
+            },
+            {
+              "name": "totalPrice",
+              "type": "number",
+              "label": "Total Price",
+              "placeholder": "Enter",
+              "min": 0
+            }
+          ]
+        },
+        {
+          "id": "nominated-bank-block",
+          "title": "Nominated Bank Information",
+          "layout": "2-col",
+          "fields": [
+            {
+              "name": "bankName",
+              "type": "searchable-select",
+              "label": "Bank Name",
+              "placeholder": "Select or search bank",
+              "options": {
+                "type": "static",
+                "items": [
+                  {
+                    "label": "Al-Arafah Islami Bank PLC",
+                    "value": "al-arafah-islami-bank"
+                  },
+                  {
+                    "label": "Bangladesh Krishi Bank",
+                    "value": "bangladesh-krishi-bank"
+                  },
+                  { "label": "BRAC Bank PLC", "value": "brac-bank" },
+                  { "label": "City Bank PLC", "value": "city-bank" },
+                  {
+                    "label": "Dutch-Bangla Bank PLC",
+                    "value": "dutch-bangla-bank"
+                  },
+                  { "label": "Eastern Bank PLC", "value": "eastern-bank" },
+                  { "label": "Exim Bank PLC", "value": "exim-bank" },
+                  {
+                    "label": "First Security Islami Bank PLC",
+                    "value": "first-security-islami-bank"
+                  },
+                  {
+                    "label": "Islami Bank Bangladesh PLC",
+                    "value": "islami-bank-bangladesh"
+                  },
+                  { "label": "Janata Bank PLC", "value": "janata-bank" },
+                  {
+                    "label": "Mercantile Bank PLC",
+                    "value": "mercantile-bank"
+                  },
+                  {
+                    "label": "Mutual Trust Bank PLC",
+                    "value": "mutual-trust-bank"
+                  },
+                  { "label": "National Bank PLC", "value": "national-bank" },
+                  { "label": "Dutch-Bangla Bank PLC", "value": "nrb-bank" },
+                  { "label": "ONE Bank PLC", "value": "one-bank" },
+                  { "label": "Premier Bank PLC", "value": "premier-bank" },
+                  { "label": "Prime Bank PLC", "value": "prime-bank" },
+                  { "label": "Pubali Bank PLC", "value": "pubali-bank" },
+                  { "label": "Rupali Bank PLC", "value": "rupali-bank" },
+                  {
+                    "label": "Shahjalal Islami Bank PLC",
+                    "value": "shahjalal-islami-bank"
+                  },
+                  {
+                    "label": "Social Islami Bank PLC",
+                    "value": "social-islami-bank"
+                  },
+                  { "label": "Sonali Bank PLC", "value": "sonali-bank" },
+                  { "label": "Southeast Bank PLC", "value": "southeast-bank" },
+                  { "label": "Standard Bank PLC", "value": "standard-bank" },
+                  { "label": "Trust Bank PLC", "value": "trust-bank" },
+                  { "label": "UCB Bank PLC", "value": "ucb-bank" },
+                  {
+                    "label": "United Commercial Bank PLC",
+                    "value": "united-commercial-bank"
+                  },
+                  { "label": "Uttara Bank PLC", "value": "uttara-bank" }
+                ]
+              }
+            },
+            {
+              "name": "branchName",
+              "type": "text",
+              "label": "Branch Name",
+              "placeholder": "Enter branch name"
+            },
+            {
+              "name": "branchAddress",
+              "type": "textarea",
+              "label": "Branch Address",
+              "placeholder": "Address",
+              "required": false
+            }
+          ]
+        },
+        {
+          "id": "trade-license-block",
+          "title": "Trade License",
+          "layout": "2-col",
+          "fields": [
+            {
+              "name": "tradeLicenseNo",
+              "type": "text",
+              "label": "Trade License no",
+              "placeholder": "Enter"
+            },
+            {
+              "name": "tradeLicenseIssuedDate",
+              "type": "date",
+              "label": "Trade License Issued Date",
+              "placeholder": "DD/MM/YYYY"
+            },
+            {
+              "name": "tradeLicenseExpiredDate",
+              "type": "date",
+              "label": "Trade License Expired Date",
+              "placeholder": "DD/MM/YYYY"
+            },
+            {
+              "name": "tradeLicenseIssuedBy",
+              "type": "select",
+              "label": "Trade License Issued By",
+              "placeholder": "Select One",
+              "options": {
+                "type": "static",
+                "items": [
+                  { "label": "City Corporation", "value": "city-corporation" },
+                  { "label": "Municipality", "value": "municipality" },
+                  { "label": "Union Parishad", "value": "union-parishad" },
+                  { "label": "Others", "value": "others" }
+                ]
+              }
+            },
+            {
+              "name": "tradeLicenseAddress",
+              "type": "textarea",
+              "label": "Address",
+              "placeholder": "Address",
+              "required": false
+            },
+            {
+              "name": "businessType",
+              "type": "text",
+              "label": "Business Type",
+              "placeholder": "Enter",
+              "required": false
+            }
+          ]
+        },
+        {
+          "id": "chamber-association-block",
+          "title": "Information Of Chamber/Association",
+          "layout": "2-col",
+          "fields": [
+            {
+              "name": "chamberAssociationName",
+              "type": "searchable-select",
+              "label": "Chamber/Association Name",
+              "placeholder": "Select or search",
+              "options": {
+                "type": "static",
+                "items": [
+                  {
+                    "label": "DCCI (Dhaka Chamber of Commerce & Industry)",
+                    "value": "dcci"
+                  },
+                  {
+                    "label": "MCCI (Metropolitan Chamber of Commerce & Industry)",
+                    "value": "mcci"
+                  },
+                  {
+                    "label": "BGMEA (Bangladesh Garment Manufacturers and Exporters Association)",
+                    "value": "bgmea"
+                  },
+                  {
+                    "label": "BKMEA (Bangladesh Knitwear Manufacturers and Exporters Association)",
+                    "value": "bkmea"
+                  },
+                  {
+                    "label": "BACCO (Bangladesh Association of Call Center & Outsourcing)",
+                    "value": "bacco"
+                  },
+                  {
+                    "label": "BASIS (Bangladesh Association of Software and Information Services)",
+                    "value": "basis"
+                  },
+                  {
+                    "label": "BTMA (Bangladesh Textile Mills Association)",
+                    "value": "btma"
+                  },
+                  {
+                    "label": "BLFEA (Bangladesh Leather Footwear & Goods Exporters Association)",
+                    "value": "blfea"
+                  },
+                  {
+                    "label": "Association of Ship Recycling in Bangladesh",
+                    "value": "asrb"
+                  },
+                  {
+                    "label": "BAEC (Bangladesh Agro-processors Association)",
+                    "value": "baec"
+                  },
+                  {
+                    "label": "BSRM (Bangladesh Steel Re-Rolling Mills)",
+                    "value": "bsrm"
+                  },
+                  {
+                    "label": "BACCI (Bangladesh Australian Chamber of Commerce and Industry)",
+                    "value": "bacci"
+                  },
+                  {
+                    "label": "FICCI (Federation of Indian Chambers of Commerce and Industry Bangladesh Chapter)",
+                    "value": "ficci"
+                  },
+                  {
+                    "label": "AMCHAM (American Chamber of Commerce in Bangladesh)",
+                    "value": "amcham"
+                  },
+                  {
+                    "label": "CCCI (Chittagong Chamber of Commerce and Industry)",
+                    "value": "ccci"
+                  },
+                  {
+                    "label": "KJCCI (Khulna Junior Chamber of Commerce and Industry)",
+                    "value": "kjcci"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "chamberCategory",
+              "type": "text",
+              "label": "Chamber Category",
+              "placeholder": "Enter",
+              "required": false
+            },
+            {
+              "name": "serialNoChamberCertificate",
+              "type": "text",
+              "label": "Serial No of Chamber Certificate",
+              "placeholder": "Enter",
+              "required": false
+            },
+            {
+              "name": "chamberIssueDate",
+              "type": "date",
+              "label": "Issue Date",
+              "placeholder": "DD/MM/YYYY",
+              "required": false
+            },
+            {
+              "name": "chamberAssociationPhone",
+              "type": "phone",
+              "label": "Chamber/Association Phone",
+              "required": false
+            },
+            {
+              "name": "chamberValidityDate",
+              "type": "date",
+              "label": "Validity Date",
+              "placeholder": "DD/MM/YYYY",
+              "required": false
+            },
+            {
+              "name": "chamberAddress",
+              "type": "textarea",
+              "label": "Chamber Address",
+              "placeholder": "Address",
+              "required": false
+            }
+          ]
+        },
+        {
+          "id": "import-slab-block",
+          "title": "Import Slab",
+          "layout": "single",
+          "fields": [
+            {
+              "name": "ircSlab",
+              "type": "select",
+              "label": "IRC Slab",
+              "placeholder": "Select One",
+              "options": {
+                "type": "static",
+                "items": [
+                  { "label": "1,00,000", "value": "100000" },
+                  { "label": "2,00,000", "value": "200000" },
+                  { "label": "5,00,000", "value": "500000" },
+                  { "label": "10,00,000", "value": "1000000" },
+                  { "label": "25,00,000", "value": "2500000" },
+                  { "label": "50,00,000", "value": "5000000" }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "doc-attachments-block",
+          "title": "Necessary Document Attachments",
+          "layout": "single",
+          "fields": [
+            {
+              "name": "tinCertificate",
+              "type": "file",
+              "label": "TIN Certificate",
+              "accept": ["pdf", "jpg", "jpeg", "png"],
+              "maxSizeMB": 5,
+              "fileVariant": "inline"
+            },
+            {
+              "name": "bankSolvencyCertificate",
+              "type": "file",
+              "label": "Bank Solvency Certificate",
+              "accept": ["pdf", "jpg", "jpeg", "png"],
+              "maxSizeMB": 5,
+              "fileVariant": "inline"
+            },
+            {
+              "name": "recommendationLetter",
+              "type": "file",
+              "label": "Recommendation Letter",
+              "accept": ["pdf", "jpg", "jpeg", "png"],
+              "maxSizeMB": 5,
+              "fileVariant": "inline"
+            },
+            {
+              "name": "tradeLicenseCopy",
+              "type": "file",
+              "label": "Trade License Copy",
+              "accept": ["pdf", "jpg", "jpeg", "png"],
+              "maxSizeMB": 5,
+              "fileVariant": "inline"
+            },
+            {
+              "name": "incorporationCertificate",
+              "type": "file",
+              "label": "Incorporation Certificate",
+              "accept": ["pdf", "jpg", "jpeg", "png"],
+              "maxSizeMB": 5,
+              "fileVariant": "inline",
+              "required": false,
+              "showWhen": {
+                "field": "ircSlab",
+                "operator": "in",
+                "value": ["1000000", "2500000", "5000000"]
+              }
+            },
+            {
+              "name": "factoryLayoutPlan",
+              "type": "file",
+              "label": "Factory Layout Plan",
+              "accept": ["pdf", "jpg", "jpeg", "png"],
+              "maxSizeMB": 5,
+              "fileVariant": "inline",
+              "required": false,
+              "showWhen": {
+                "field": "ircSlab",
+                "operator": "in",
+                "value": ["1000000", "2500000", "5000000"]
+              }
+            },
+            {
+              "name": "bidaPermission",
+              "type": "file",
+              "label": "BIDA Permission",
+              "accept": ["pdf", "jpg", "jpeg", "png"],
+              "maxSizeMB": 5,
+              "fileVariant": "inline",
+              "required": false,
+              "showWhen": {
+                "field": "ircSlab",
+                "operator": "in",
+                "value": ["2500000", "5000000"]
+              }
+            },
+            {
+              "name": "environmentClearanceCertificate",
+              "type": "file",
+              "label": "Environment Clearance Certificate",
+              "accept": ["pdf", "jpg", "jpeg", "png"],
+              "maxSizeMB": 5,
+              "fileVariant": "inline",
+              "required": false,
+              "showWhen": {
+                "field": "ircSlab",
+                "operator": "in",
+                "value": ["2500000", "5000000"]
+              }
+            }
+          ]
+        },
+        {
+          "id": "undertaking-block",
+          "title": "Undertaking",
+          "layout": "single",
+          "fields": [
+            {
+              "name": "declaration",
+              "type": "checkbox",
+              "label": "I hereby declare that the information provided is true and correct to the best of my knowledge and belief"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -20,7 +20,14 @@ export function flattenGroupedValues(
       const isPlainObject =
         value !== null && typeof value === "object" && !Array.isArray(value);
 
-      if (isPlainObject && !("url" in (value as object))) {
+      // number-unit compound value — keep { amount, unit } as a leaf
+      const isNumberUnit =
+        isPlainObject &&
+        Object.keys(value as object).length === 2 &&
+        "amount" in (value as object) &&
+        "unit" in (value as object);
+
+      if (isPlainObject && !("url" in (value as object)) && !isNumberUnit) {
         // Nested group — recurse into it
         walk(value as Record<string, unknown>);
       } else {
