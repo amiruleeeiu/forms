@@ -1,5 +1,5 @@
 import {
-  StepFormEngine,
+  FormEngine,
   buildDefaultValues,
   buildSchemaFromConfig,
 } from "@/form-engine";
@@ -31,12 +31,10 @@ const testConfig = {
 const testSchema = buildSchemaFromConfig(testConfig);
 const testDefaults = buildDefaultValues(testConfig);
 
-type TestFormValues = typeof testDefaults;
-
 function setup() {
   const onSubmit = vi.fn();
   const { user } = renderWithProviders(
-    <StepFormEngine
+    <FormEngine
       config={stepFormConfig}
       schema={testSchema}
       defaultValues={testDefaults as never}
@@ -237,7 +235,7 @@ describe("StepForm — Step 4 (Terms)", () => {
   it("calls onSubmit after accepting terms and submitting", async () => {
     const onSubmit = vi.fn();
     const { user } = renderWithProviders(
-      <StepFormEngine
+      <FormEngine
         config={stepFormConfig}
         schema={testSchema}
         defaultValues={testDefaults as never}

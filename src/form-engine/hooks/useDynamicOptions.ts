@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer } from "react";
 import { useWatch } from "react-hook-form";
 import type { OptionsConfig, SelectOption } from "../types";
 
@@ -7,6 +7,23 @@ export type DynamicOptionsResult = {
   loading: boolean;
   error: Error | null;
 };
+
+type State = { options: SelectOption[]; loading: boolean; error: Error | null };
+type Action =
+  | { type: "start" }
+  | { type: "success"; items: SelectOption[] }
+  | { type: "error"; error: Error };
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case "start":
+      return { options: state.options, loading: true, error: null };
+    case "success":
+      return { options: action.items, loading: false, error: null };
+    case "error":
+      return { options: state.options, loading: false, error: action.error };
+  }
+}
 
 /**
  * Resolves options from a static list or an async API fetcher.
@@ -28,18 +45,17 @@ export function useDynamicOptions(
   // Always call useWatch with a stable name; returns undefined for unknown fields.
   const watchedValue = useWatch({ name: dependsOnName as never });
 
-  const [options, setOptions] = useState<SelectOption[]>(() =>
-    config?.type === "static" ? config.items : [],
-  );
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [state, dispatch] = useReducer(reducer, {
+    options: config?.type === "static" ? config.items : [],
+    loading: false,
+    error: null,
+  });
 
   useEffect(() => {
     if (!config || config.type !== "api") return;
 
     let cancelled = false;
-    setLoading(true);
-    setError(null);
+    dispatch({ type: "start" });
 
     const params =
       config.dependsOn && watchedValue != null
@@ -49,16 +65,14 @@ export function useDynamicOptions(
     config
       .fetcher(params)
       .then((items) => {
-        if (!cancelled) {
-          setOptions(items);
-          setLoading(false);
-        }
+        if (!cancelled) dispatch({ type: "success", items });
       })
       .catch((err: unknown) => {
-        if (!cancelled) {
-          setError(err instanceof Error ? err : new Error(String(err)));
-          setLoading(false);
-        }
+        if (!cancelled)
+          dispatch({
+            type: "error",
+            error: err instanceof Error ? err : new Error(String(err)),
+          });
       });
 
     return () => {
@@ -67,5 +81,5 @@ export function useDynamicOptions(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watchedValue, config?.type]);
 
-  return { options, loading, error };
+  return state;
 }

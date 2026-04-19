@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Check } from "lucide-react";
+import { Check, ChevronRight } from "lucide-react";
 
 type Step = {
   title: string;
@@ -14,91 +14,58 @@ type StepIndicatorProps = {
 
 export function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
   return (
-    <nav
-      aria-label="Form steps"
-      className="w-full"
-      style={{
-        display: "grid",
-        gridTemplateColumns: `repeat(${steps.length}, 1fr)`,
-      }}
-    >
+    <nav aria-label="Form steps" className="flex w-full flex-wrap bg-white">
       {steps.map((step, index) => {
         const isCompleted = index < currentStep;
         const isActive = index === currentStep;
-        const isFirst = index === 0;
         const isLast = index === steps.length - 1;
 
-        // Each connector half is filled when the step on the left side is completed.
-        // Left-half of cell i: filled if step i-1 is completed → index <= currentStep
-        // Right-half of cell i: filled if step i is completed → index < currentStep
-        const leftLineFilled = !isFirst && index <= currentStep;
-        const rightLineFilled = !isLast && isCompleted;
-
         return (
-          <div key={step.title} className="relative flex flex-col items-center">
-            {/* Connector — left half */}
-            {!isFirst && (
-              <div
-                aria-hidden="true"
-                className="absolute top-4.5 left-0 right-1/2 h-0.5 -translate-y-1/2"
-              >
-                <div
-                  className={cn(
-                    "h-full w-full",
-                    leftLineFilled ? "bg-primary" : "bg-muted",
-                  )}
-                />
-              </div>
+          <div
+            key={step.title}
+            aria-current={isActive ? "step" : undefined}
+            className={cn(
+              "relative flex flex-1 basis-[160px] items-center justify-between pl-5 pr-3 py-[18px] border-b-[1.5px] transition-colors",
+              isActive || isCompleted ? "border-primary" : "border-border",
             )}
-
-            {/* Connector — right half */}
-            {!isLast && (
-              <div
-                aria-hidden="true"
-                className="absolute top-4.5 left-1/2 right-0 h-0.5 -translate-y-1/2"
+          >
+            <div className="flex flex-col gap-1.5 min-w-0">
+              <p
+                className={cn(
+                  "text-[11px] uppercase tracking-[0.08em] leading-none font-['DM_Sans',sans-serif]",
+                  isActive || isCompleted
+                    ? "text-primary"
+                    : "text-muted-foreground",
+                )}
               >
-                <div
-                  className={cn(
-                    "h-full w-full",
-                    rightLineFilled ? "bg-primary" : "bg-muted",
-                  )}
-                />
-              </div>
-            )}
-
-            {/* Circle */}
-            <div
-              aria-current={isActive ? "step" : undefined}
-              className={cn(
-                "relative z-10 flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold transition-all duration-200",
-                isCompleted && "bg-primary text-primary-foreground shadow-sm",
-                isActive &&
-                  "bg-primary text-primary-foreground ring-4 ring-primary/20 shadow-md",
-                !isCompleted &&
-                  !isActive &&
-                  "border-2 border-muted-foreground/25 bg-background text-muted-foreground/60",
-              )}
-            >
-              {isCompleted ? (
-                <Check className="h-4 w-4 stroke-[2.5]" aria-hidden="true" />
-              ) : (
-                index + 1
-              )}
+                {`STEP ${index + 1}`}
+              </p>
+              <p
+                className={cn(
+                  "text-base leading-snug truncate font-['DM_Sans',sans-serif]",
+                  isActive
+                    ? "font-medium text-foreground"
+                    : isCompleted
+                      ? "text-muted-foreground"
+                      : "text-muted-foreground",
+                )}
+              >
+                {step.title}
+              </p>
             </div>
 
-            {/* Label */}
-            <span
-              className={cn(
-                "mt-2 text-center text-xs leading-tight",
-                isActive
-                  ? "font-semibold text-primary"
-                  : isCompleted
-                    ? "text-muted-foreground"
-                    : "text-muted-foreground/50",
-              )}
-            >
-              {step.title}
-            </span>
+            {/* Completed checkmark / chevron separator */}
+            {isCompleted && !isLast ? (
+              <Check
+                aria-hidden="true"
+                className="size-4 shrink-0 text-primary ml-2"
+              />
+            ) : !isLast ? (
+              <ChevronRight
+                aria-hidden="true"
+                className="size-5 shrink-0 text-muted-foreground ml-2"
+              />
+            ) : null}
           </div>
         );
       })}

@@ -2,7 +2,7 @@ import { renderWithProviders } from "@/test/utils";
 import { screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
-import { StepFormEngine } from "../StepFormEngine";
+import { FormEngine } from "../FormEngine";
 import type { StepFormConfig } from "../types";
 
 const schema = z.object({
@@ -56,7 +56,7 @@ const config: StepFormConfig = {
 
 function setup(onSubmit = vi.fn()) {
   const { user } = renderWithProviders(
-    <StepFormEngine<FormValues>
+    <FormEngine<FormValues>
       config={config}
       schema={schema}
       defaultValues={{ fullName: "", email: "", city: "" }}

@@ -1,6 +1,6 @@
 "use client";
 
-import { StepFormEngine } from "@/form-engine";
+import { FormEngine } from "@/form-engine";
 import { stepFormConfig } from "./stepFormConfig";
 
 export function StepForm() {
@@ -8,5 +8,5 @@ export function StepForm() {
     console.log("StepForm submitted:", values);
   }
 
-  return <StepFormEngine config={stepFormConfig} onSubmit={handleSubmit} />;
+  return <FormEngine config={stepFormConfig} onSubmit={handleSubmit} />;
 }

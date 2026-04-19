@@ -115,7 +115,7 @@ function FormLabel({
       data-slot="form-label"
       htmlFor={formItemId}
       className={cn(
-        "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+        "text-base font-normal leading-snug text-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
         error && "text-destructive",
         className,
       )}

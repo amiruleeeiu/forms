@@ -97,12 +97,13 @@ function FileUploadField<TFieldValues extends FieldValues>({
     }
   }
 
+  const rawValue: unknown = field.value;
   const files: File[] = multiple
-    ? Array.isArray(field.value)
-      ? (field.value as File[])
+    ? Array.isArray(rawValue)
+      ? (rawValue as File[])
       : []
-    : field.value instanceof File
-      ? [field.value as File]
+    : rawValue instanceof File
+      ? [rawValue]
       : [];
 
   function formatSize(bytes: number) {
@@ -131,7 +132,6 @@ function FileUploadField<TFieldValues extends FieldValues>({
                 type="button"
                 disabled={disabled}
                 onClick={() => !disabled && inputRef.current?.click()}
-                aria-required={required}
                 className={cn(
                   "inline-flex shrink-0 items-center gap-1.5 rounded border border-input bg-background px-3 py-1.5 text-sm font-medium shadow-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
                   hasError && "border-destructive text-destructive",
@@ -175,7 +175,6 @@ function FileUploadField<TFieldValues extends FieldValues>({
               role="button"
               tabIndex={disabled ? -1 : 0}
               aria-disabled={disabled}
-              aria-required={required}
               onDrop={handleDrop}
               onDragOver={handleDragOver}
               onClick={() => !disabled && inputRef.current?.click()}

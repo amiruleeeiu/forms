@@ -131,15 +131,6 @@ function buildFieldSchema(field: FieldConfig): z.ZodTypeAny {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function collectAllFields(
-  config: NormalFormConfig | StepFormConfig,
-): FieldConfig[] {
-  if (config.mode === "normal") {
-    return config.blocks.flatMap((b) => b.fields);
-  }
-  return config.steps.flatMap((step) => step.blocks.flatMap((b) => b.fields));
-}
-
 /** Wraps any Zod schema as optional — no-op if already optional. */
 function makeOptional(schema: z.ZodTypeAny): z.ZodTypeAny {
   return schema instanceof z.ZodOptional ? schema : schema.optional();

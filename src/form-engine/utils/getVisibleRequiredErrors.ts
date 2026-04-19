@@ -52,7 +52,8 @@ export function getVisibleRequiredErrors(
         errors.push({
           name: field.name,
           message:
-            field.validation?.messages?.required ?? "This field is required",
+            field.validation?.messages?.required ??
+            `${field.label} is required`,
         });
       }
     }

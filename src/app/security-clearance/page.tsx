@@ -3,9 +3,9 @@ import Link from "next/link";
 
 export default function SecurityClearancePage() {
   return (
-    <div className="min-h-screen bg-muted/40 px-4 py-12">
-      <main className="mx-auto w-full max-w-3xl rounded-xl border bg-background p-6 shadow-sm sm:p-8">
-        <div className="mb-8">
+    <div className="min-h-screen bg-white px-4 py-12">
+      <main className="mx-auto w-full max-w-5xl">
+        <div className="mb-6">
           <Link
             href="/"
             className="mb-4 inline-block text-sm text-muted-foreground hover:text-foreground"

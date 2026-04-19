@@ -83,14 +83,19 @@ function ResetWatcher({ fields, resetOn }: ResetWatcherProps) {
  */
 function RepeatableBlockRenderer({ config }: BlockRendererProps) {
   const { repeatable } = config;
-  if (!repeatable) return null;
+  const {
+    arrayName = "",
+    minItems = 0,
+    addLabel = "+ Add Another",
+  } = repeatable ?? {};
 
-  const { arrayName, minItems = 0, addLabel = "+ Add Another" } = repeatable;
   const { control } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
     name: arrayName,
   });
+
+  if (!repeatable) return null;
 
   const layout = config.layout ?? "single";
   const gridClass = LAYOUT_CLASS[layout];
@@ -108,9 +113,7 @@ function RepeatableBlockRenderer({ config }: BlockRendererProps) {
       {(config.title || config.description) && (
         <div className="space-y-1">
           {config.title && (
-            <h3 className="text-base font-semibold leading-none tracking-tight">
-              {config.title}
-            </h3>
+            <h3 className="text-base font-bold text-primary">{config.title}</h3>
           )}
           {config.description && (
             <p className="text-sm text-muted-foreground">
@@ -121,7 +124,10 @@ function RepeatableBlockRenderer({ config }: BlockRendererProps) {
       )}
 
       {fields.map((item, index) => (
-        <div key={item.id} className="rounded-lg border p-4 space-y-4">
+        <div
+          key={item.id}
+          className="rounded-lg border border-form-border bg-white p-4 space-y-4"
+        >
           <div className={cn(gridClass || "space-y-4")}>
             {config.fields.map((field) => {
               const prefixedConfig = {
@@ -139,7 +145,7 @@ function RepeatableBlockRenderer({ config }: BlockRendererProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => remove(index)}
-                className="text-destructive hover:text-destructive"
+                className="text-destructive hover:text-destructive border-destructive/30 hover:border-destructive"
               >
                 Remove
               </Button>
@@ -153,6 +159,7 @@ function RepeatableBlockRenderer({ config }: BlockRendererProps) {
         variant="outline"
         size="sm"
         onClick={() => append(getItemDefault())}
+        className="border-primary text-primary hover:bg-primary/5"
       >
         {addLabel}
       </Button>
@@ -200,11 +207,11 @@ export function BlockRenderer({ config }: BlockRendererProps) {
     <>
       {/* ResetWatcher is always at position-0 so React never unmounts it on visibility toggle */}
       {watcher}
-      <div className="space-y-4 rounded-lg border p-4">
+      <div className="space-y-4">
         {(config.title || config.description) && (
           <div className="space-y-1">
             {config.title && (
-              <h3 className="text-base font-semibold leading-none tracking-tight">
+              <h3 className="text-base font-bold text-primary">
                 {config.title}
               </h3>
             )}

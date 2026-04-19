@@ -103,8 +103,6 @@ describe("TextInputField", () => {
   });
 
   it("respects disabled prop", () => {
-    const form = {} as ReturnType<typeof useForm>;
-    // render a disabled variant through Wrapper customization inline
     renderWithProviders(<Wrapper />);
     // Quick check: disabled attribute
     // The actual disabled test is done inline below

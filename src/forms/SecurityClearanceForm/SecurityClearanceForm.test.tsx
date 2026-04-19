@@ -1,5 +1,5 @@
 import {
-  StepFormEngine,
+  FormEngine,
   buildDefaultValues,
   buildSchemaFromConfig,
 } from "@/form-engine";
@@ -35,7 +35,7 @@ const testDefaults = buildDefaultValues(testConfig);
 function setup() {
   const onSubmit = vi.fn();
   const { user } = renderWithProviders(
-    <StepFormEngine
+    <FormEngine
       config={testConfig}
       schema={testSchema}
       defaultValues={testDefaults as never}

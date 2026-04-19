@@ -86,8 +86,8 @@ function DateTrigger({
                 : formDescriptionId
             }
             className={cn(
-              "h-8 w-full justify-start gap-2 px-2.5 font-normal",
-              "data-[empty=true]:text-muted-foreground",
+              "h-[46px] w-full justify-start gap-2 rounded-[4px] px-[15px] font-normal",
+              "data-[empty=true]:text-[#94a3b8]",
             )}
           />
         }

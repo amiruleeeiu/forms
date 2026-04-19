@@ -29,8 +29,8 @@ const PhoneInputComponent = forwardRef<
     <input
       ref={ref}
       className={cn(
-        "h-full min-w-0 flex-1 bg-transparent px-2.5 text-sm outline-none",
-        "placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
+        "h-full min-w-0 flex-1 bg-transparent px-[15px] text-base outline-none",
+        "placeholder:text-[#94a3b8] disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}
       {...props}
@@ -62,6 +62,7 @@ function PhoneInputField<TFieldValues extends FieldValues>({
             <PhoneInput
               international
               defaultCountry="BD"
+              countryCallingCodeEditable={false}
               placeholder={placeholder}
               value={field.value ?? ""}
               onChange={(val) => field.onChange(val ?? "")}
@@ -69,8 +70,8 @@ function PhoneInputField<TFieldValues extends FieldValues>({
               disabled={disabled}
               inputComponent={PhoneInputComponent}
               className={cn(
-                "phone-input-wrapper flex h-8 w-full items-center rounded border bg-transparent transition-colors",
-                fieldState.error ? "border-destructive" : "border-input",
+                "phone-input-wrapper flex h-[46px] w-full items-center rounded-[4px] border bg-white transition-colors",
+                fieldState.error ? "border-destructive" : "border-form-border",
               )}
             />
           </div>

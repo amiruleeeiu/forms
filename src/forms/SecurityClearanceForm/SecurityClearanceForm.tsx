@@ -1,6 +1,6 @@
 "use client";
 
-import { StepFormEngine, groupValuesByConfig } from "@/form-engine";
+import { FormEngine, groupValuesByConfig } from "@/form-engine";
 import { securityClearanceFormConfig } from "./securityClearanceFormConfig";
 
 // ---------------------------------------------------------------------------
@@ -61,7 +61,7 @@ export function SecurityClearanceForm() {
   }
 
   return (
-    <StepFormEngine
+    <FormEngine
       config={securityClearanceFormConfig}
       onSubmit={handleSubmit}
       onDraft={handleDraft}

@@ -52,12 +52,7 @@ function CheckboxGroupField<TFieldValues extends FieldValues>({
           </FormLabel>
           {description && <FormDescription>{description}</FormDescription>}
         </div>
-        <div
-          role="group"
-          aria-label={label}
-          aria-required={required}
-          className="flex flex-col gap-2"
-        >
+        <div role="group" aria-label={label} className="flex flex-col gap-2">
           {options.map((option) => (
             <div key={option.value} className="flex items-center gap-2">
               <Checkbox
